@@ -416,12 +416,12 @@ const icon = (n, s = 16) => `<svg class="ic" width="${s}" height="${s}" viewBox=
 /* ---------- sample data ---------- */
 const CONSIGNOR = { name: 'Sample Supplier Pvt Ltd', place: 'Andheri East, Mumbai, Maharashtra', gstin: '27AAAAA0000A1Z5' };
 const CUSTOMERS = {
-  'ABC Telecom Pvt Ltd': { place: 'Thane, Maharashtra', gstin: '27AAAAA0000A2Z4' },
-  'XYZ Networks Ltd': { place: 'Ahmedabad, Gujarat', gstin: '24AAAAA0000A1Z5' },
-  'PQR Infratel Pvt Ltd': { place: 'Pune, Maharashtra', gstin: '27AAAAA0000A3Z3' },
-  'LMN Fibre Projects': { place: 'Bengaluru, Karnataka', gstin: '29AAAAA0000A1Z5' },
-  'DEF Towers Pvt Ltd': { place: 'Nagpur, Maharashtra', gstin: '27AAAAA0000A4Z2' },
-  'RST Networks Pvt Ltd': { place: 'Chennai, Tamil Nadu', gstin: '33AAAAA0000A1Z5' },
+  'ABC Electricals Pvt Ltd': { place: 'Thane, Maharashtra', gstin: '27AAAAA0000A2Z4' },
+  'XYZ Cables Ltd': { place: 'Ahmedabad, Gujarat', gstin: '24AAAAA0000A1Z5' },
+  'PQR Fabricators Pvt Ltd': { place: 'Pune, Maharashtra', gstin: '27AAAAA0000A3Z3' },
+  'LMN Connectivity': { place: 'Bengaluru, Karnataka', gstin: '29AAAAA0000A1Z5' },
+  'DEF Power Systems Pvt Ltd': { place: 'Nagpur, Maharashtra', gstin: '27AAAAA0000A4Z2' },
+  'RST Systems Pvt Ltd': { place: 'Chennai, Tamil Nadu', gstin: '33AAAAA0000A1Z5' },
 };
 const TERMS = {
   '75': { first: 75, accept: true, label: '75% on delivery, 25% on acceptance' },
@@ -440,12 +440,12 @@ function seed() {
     seq: 1, nextChallan: 1064, nextInvoice: 343, tallyQueue: [], lastSync: new Date(Date.now() - 12 * 60000),
     stock: 5000000, debtors: 12500000,
     pos: [
-      po('PO-2026-0398', 'XYZ Networks Ltd', 'Optical fibre cable, 48 core', '8544', 'm', 40, 100000, '75', 52),
-      po('PO-2026-0422', 'DEF Towers Pvt Ltd', 'Battery bank, 48 V', '8507', 'sets', 15000, 200, '100', 70),
-      po('PO-2026-0451', 'ABC Telecom Pvt Ltd', 'Optical fibre cable, 24 core', '8544', 'm', 25, 240000, '75', 41),
-      po('PO-2026-0467', 'PQR Infratel Pvt Ltd', 'Tower mounting hardware', '7308', 'sets', 6000, 2000, '90', 33, 3),
-      po('PO-2026-0480', 'LMN Fibre Projects', 'Fibre patch cord, 3 m', '8544', 'pcs', 250, 34000, '75', 20),
-      po('PO-2026-0489', 'ABC Telecom Pvt Ltd', 'Battery bank, 24 V', '8507', 'sets', 12500, 400, '75', 6),
+      po('PO-2026-0398', 'XYZ Cables Ltd', 'Speaker cable, 2 core', '8544', 'm', 40, 100000, '75', 52),
+      po('PO-2026-0422', 'DEF Power Systems Pvt Ltd', 'UPS battery set, 3 kVA', '8507', 'sets', 15000, 200, '100', 70),
+      po('PO-2026-0451', 'ABC Electricals Pvt Ltd', 'CAT6 cable', '8544', 'm', 25, 240000, '75', 41),
+      po('PO-2026-0467', 'PQR Fabricators Pvt Ltd', 'Video wall mounting frames', '7308', 'sets', 6000, 2000, '90', 33, 3),
+      po('PO-2026-0480', 'LMN Connectivity', 'HDMI cable, 3 m', '8544', 'pcs', 250, 34000, '75', 20),
+      po('PO-2026-0489', 'ABC Electricals Pvt Ltd', 'UPS battery set, 1 kVA', '8507', 'sets', 12500, 400, '75', 6),
     ],
     deliveries: [
       dc('DC-1027', 'PO-2026-0398', 38, 100000, 35),
@@ -456,12 +456,12 @@ function seed() {
       dc('DC-1063', 'PO-2026-0480', 5, 20000),
     ],
     invoices: [
-      inv('0281', 'DEF Towers Pvt Ltd', 'PO-2026-0422', 3000000, 60),
-      inv('0291', 'XYZ Networks Ltd', 'PO-2026-0398', 3000000, 38),
-      inv('0318', 'ABC Telecom Pvt Ltd', 'PO-2026-0451', 4500000, 24),
-      inv('0327', 'PQR Infratel Pvt Ltd', 'PO-2026-0467', 7200000, 18),
-      inv('0336', 'PQR Infratel Pvt Ltd', 'PO-2026-0467', 3600000, 9),
-      inv('0342', 'LMN Fibre Projects', '', 3750000, 5, false),
+      inv('0281', 'DEF Power Systems Pvt Ltd', 'PO-2026-0422', 3000000, 60),
+      inv('0291', 'XYZ Cables Ltd', 'PO-2026-0398', 3000000, 38),
+      inv('0318', 'ABC Electricals Pvt Ltd', 'PO-2026-0451', 4500000, 24),
+      inv('0327', 'PQR Fabricators Pvt Ltd', 'PO-2026-0467', 7200000, 18),
+      inv('0336', 'PQR Fabricators Pvt Ltd', 'PO-2026-0467', 3600000, 9),
+      inv('0342', 'LMN Connectivity', '', 3750000, 5, false),
     ],
   };
 }
@@ -714,14 +714,14 @@ function formAddPO() {
   <header class="head"><h1>New Purchase Order</h1><button class="close" style="border:0;background:none;cursor:pointer" type="button" data-act="toggle-add" aria-label="Close">${icon('close')}</button></header>
   <form class="pad stack form-page" data-form="add-po">
     <p class="muted">Filled with sample values so you can save it in one click.</p>
-    <div class="row"><label class="req" for="f-cust">Customer Name*</label><div><input id="f-cust" name="customer" list="cust-list" value="RST Networks Pvt Ltd"><datalist id="cust-list">${custs}</datalist></div></div>
+    <div class="row"><label class="req" for="f-cust">Customer Name*</label><div><input id="f-cust" name="customer" list="cust-list" value="RST Systems Pvt Ltd"><datalist id="cust-list">${custs}</datalist></div></div>
     <div class="row"><label class="req" for="f-id">PO Number*</label><input id="f-id" name="id" value="${esc(nextPoNumber())}"></div>
     <div class="row"><label for="f-terms">Billing Terms</label><select id="f-terms" name="terms">${Object.entries(TERMS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}</select></div>
     <div class="sec">
       <div class="table-wrap"><table class="rtable item-table">
         <thead><tr><th class="l">Item details</th><th class="l">HSN</th><th>Quantity</th><th class="l">Unit</th><th>Rate (₹)</th><th>Amount</th></tr></thead>
         <tbody><tr>
-          <td class="l" data-label="Item details"><input id="f-item" name="item" aria-label="Item details" value="Optical fibre cable, 24 core"></td>
+          <td class="l" data-label="Item details"><input id="f-item" name="item" aria-label="Item details" value="CAT6 cable"></td>
           <td class="l" data-label="HSN"><input id="f-hsn" name="hsn" aria-label="HSN code" value="8544"></td>
           <td data-label="Quantity"><input class="num" id="f-qty" name="qty" type="number" min="0" step="any" aria-label="Quantity" value="320000"></td>
           <td class="l" data-label="Unit"><input id="f-unit" name="unit" aria-label="Unit" value="m"></td>
@@ -1000,7 +1000,7 @@ const STEPS = [
   { who: 'Owner', title: 'Start with the money', text: 'This is material that has left your store with no invoice yet, PO by PO, with its age.', btn: 'Next: a new PO', act() { go('purchase-orders'); } },
   { who: 'Account Manager', title: 'A new PO comes in', text: 'Enter it once. This register replaces the Excel row.', btn: 'Add the PO',
     act() {
-      addPO({ id: DEMO_PO, customer: 'RST Networks Pvt Ltd', item: 'Optical fibre cable, 24 core', hsn: '8544', unit: 'm', rate: 25, qty: 320000, terms: '75' });
+      addPO({ id: DEMO_PO, customer: 'RST Systems Pvt Ltd', item: 'CAT6 cable', hsn: '8544', unit: 'm', rate: 25, qty: 320000, terms: '75' });
       ui.flash = 'status'; go(slug(DEMO_PO)); toast(`${DEMO_PO} added for ${rs(fig(poById(DEMO_PO)).value)}.`);
     } },
   { who: 'Account Manager', title: 'Material goes out', text: 'Log the delivery and the challan is ready, already linked to the PO.', btn: 'Log delivery',
