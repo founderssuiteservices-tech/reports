@@ -22,6 +22,8 @@
   --green:#0d7647;--orange:#c2410c;--red:#c62828;
   --amber-bg:#fff8eb;--amber-line:#f1dcb3;--amber-fg:#7a4b00;--green-bg:#f0f9f4;--green-line:#cfe9da;
   --a0:#8fb8f5;--a1:#5b97ee;--a2:#2b6fdb;--a3:#174a9e;
+  --k-billed:#1e9e62;--k-ready:#1f6fe5;--k-accept:#f0a030;--k-invoice:#e8590c;--k-todo:#d5d8e3;
+  --tick:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4L18 8'/%3E%3C/svg%3E");
   --font:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235f6480' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E");
   --chev-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%231c5bd9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 5.25 7 8.75l3.5-3.5'/%3E%3C/svg%3E");
@@ -296,6 +298,51 @@ label.btn:focus-within,.drop:focus-within{outline:2px solid var(--blue);outline-
 [data-key]{scroll-margin-block:calc(var(--top-h) + var(--tabs-h) + 16px) calc(var(--guide-h) + 16px)}
 @media (prefers-reduced-motion:reduce){.flash{animation:none;outline:2px solid var(--blue);outline-offset:2px}}
 
+/* Reports: one project is one PO. Bars and stages use five money colours, and each one is also written out in words. */
+a.bar-btn{text-decoration:none}
+.subnav{display:flex;gap:0 24px;padding:0 var(--gr) 0 var(--gl);border-bottom:1px solid var(--line);overflow-x:auto}
+.subnav a{flex:none;display:flex;align-items:center;height:42px;color:var(--label);font-weight:500;text-decoration:none;white-space:nowrap;box-shadow:inset 0 -2px 0 transparent}
+.subnav a:hover{color:var(--head)}
+.subnav a[aria-current="page"]{color:var(--link);box-shadow:inset 0 -2px 0 var(--link)}
+.crumb{font-size:12px;color:var(--muted)}
+.crumb a{color:var(--link);font-weight:500;text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+.k-billed{background:var(--k-billed)}.k-ready{background:var(--k-ready)}.k-accept{background:var(--k-accept)}.k-invoice{background:var(--k-invoice)}.k-todo{background:var(--k-todo)}
+.pbar{display:flex;gap:2px;height:10px;min-width:0}
+.pbar i{display:block;min-width:3px;border-radius:2px}
+.pbar.lg{height:14px}
+.sw{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:2px;vertical-align:-1px}
+.rtable td.bar-cell{min-width:160px}
+.rtable td.bar-cell .pbar{margin:4px 0 6px}
+.rtable .tot td small{font-weight:400}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));padding-top:4px}
+.steps li{position:relative;display:grid;align-content:start;justify-items:center;gap:2px;min-width:0;padding:32px 6px 0;text-align:center}
+.steps li::before{content:"";position:absolute;z-index:1;top:0;left:50%;width:22px;height:22px;margin-left:-11px;box-sizing:border-box;border:2px solid var(--line-2);border-radius:50%;background:#fff}
+.steps li::after{content:"";position:absolute;top:10px;left:calc(50% + 15px);width:calc(100% - 30px);height:2px;background:var(--line-2)}
+.steps li:last-child::after{display:none}
+.steps li.done::before{border-color:var(--k-billed);background:var(--k-billed) var(--tick) center/14px no-repeat}
+.steps li.done::after{background:var(--k-billed)}
+.steps li.now::before{border-color:var(--blue);background:radial-gradient(circle,var(--blue) 0 4px,#fff 4.5px)}
+.steps b{font-weight:600;color:var(--head)}
+.steps small{display:block;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.steps li.now small{color:var(--link)}
+.fig small{text-wrap:pretty}
+@media (max-width:860px){.wide-only{display:none}.actionbar [data-act="accept"]{order:1}}  /* the PO bar stays two rows on a phone */
+@media (max-width:760px){
+  .rtable td.bar-cell{display:block;min-width:0;padding:4px 0 8px}
+  .rtable td.bar-cell::before{content:none}
+  .rtable td.st-cell{text-align:right}
+  .figs.keys{grid-template-columns:minmax(0,1fr);row-gap:0;padding:4px 0}
+  .keys .fig{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:12px;margin-left:0;padding:7px 16px;border-left:0}
+  .keys .fig+.fig{border-top:1px solid var(--line)}
+  .keys .fig small{grid-column:1/-1}
+  .steps{grid-template-columns:minmax(0,1fr);padding-top:0}
+  .steps li{justify-items:start;gap:0;padding:1px 0 16px 34px;text-align:left}
+  .steps li:last-child{padding-bottom:0}
+  .steps li::before{left:0;margin-left:0}
+  .steps li::after{top:26px;left:10px;width:2px;height:calc(100% - 30px)}
+}
+
 /* Middle widths */
 @media (max-width:1100px){
   .split{display:block}
@@ -410,6 +457,7 @@ const ICONS = {
   alert: '<path d="M12 4l9 16H3zM12 10v4M12 17v.5"/>',
   signed: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 14.5l2.2 2.2 4.3-4.6"/>',
   upload: '<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+  report: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9.5 17v-3M12.5 17v-5.5M15.5 17v-2"/>',
 };
 const icon = (n, s = 16) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
 
@@ -424,9 +472,9 @@ const CUSTOMERS = {
   'RST Systems Pvt Ltd': { place: 'Chennai, Tamil Nadu', gstin: '33AAAAA0000A1Z5' },
 };
 const TERMS = {
-  '75': { first: 75, accept: true, label: '75% on delivery, 25% on acceptance' },
-  '90': { first: 90, accept: true, label: '90% on delivery, 10% on acceptance' },
-  '100': { first: 100, accept: false, label: '100% on delivery' },
+  '75': { first: 75, accept: true, label: '75% on delivery, 25% on acceptance', short: '75/25' },
+  '90': { first: 90, accept: true, label: '90% on delivery, 10% on acceptance', short: '90/10' },
+  '100': { first: 100, accept: false, label: '100% on delivery', short: '100% on delivery' },
 };
 const STATUS = {
   awaiting: ['Awaiting delivery', 's-awaiting'], invoice: ['Invoice due', 's-invoice'], acceptance: ['Acceptance pending', 's-acceptance'],
@@ -466,7 +514,7 @@ function seed() {
   };
 }
 let state = seed();
-const ui = { route: 'overview', minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [] };
+const ui = { route: 'overview', minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [], cust: '' };
 const guide = { i: 0, hidden: false };
 
 /* ---------- the money logic ---------- */
@@ -795,6 +843,7 @@ function viewPO(po) {
       <div class="actionbar">
         <button class="bar-btn" type="button" data-act="toggle-log" ${left > 0 ? '' : 'disabled'}>${icon('truck', 15)} ${left > 0 ? 'Log Delivery' : 'All Delivered'}</button>
         ${T.accept ? `<button class="bar-btn" type="button" data-act="accept" ${!f.delivered || po.acceptedOn ? 'disabled' : ''}>${icon('check', 15)} ${po.acceptedOn ? 'Accepted on ' + dstr(po.acceptedOn) : 'Record Acceptance'}</button>` : ''}
+        <a class="bar-btn" href="#rep-${slug(po.id)}">${icon('report', 15)} <span class="wide-only">Project </span>Report</a>
       </div>
       <div class="pad stack detail">
         <div class="next" id="po-next"><div><span class="cap-up">What's next?</span><p>${msg}</p></div>${nextBtn}</div>
@@ -913,6 +962,7 @@ function viewSchedule() {
   const pending = sum('notBilled') - sum('counts');
   const opens = openByDC(), chase = state.deliveries.filter(d => !d.signed && opens[d.challan] > 0);
   return `
+  ${subnav('schedule')}
   <header class="head"><div><h1>Unbilled Schedule</h1><p class="muted">For your CA and bank. Built from your POs, challans and Tally invoices.</p></div></header>
   <div class="pad stack">
     ${reviewBanner()}
@@ -941,23 +991,128 @@ function viewSchedule() {
   </div>`;
 }
 
+/* ---------- project report ---------- */
+// One project is one PO. Every rupee of it sits in one place: billed, delivered and waiting for a bill, or still to deliver.
+const pctOf = (a, b) => !b || a <= 0 ? 0 : a >= b ? 100 : Math.min(99, Math.max(1, Math.round(a / b * 100)));
+const NEXT = { awaiting: 'Log the delivery', invoice: 'Accounts to bill in Tally', acceptance: 'Get customer acceptance', ready: 'Accounts to bill now', part: 'More to deliver', done: 'Closed', ahead: 'Check the PO match' };
+const WAITING = { ready: 'k-ready', acceptance: 'k-accept', invoice: 'k-invoice' };
+// ponytail: a PO billed ahead of delivery draws as billed; its status already says what is wrong.
+const rowSegs = f => [['k-billed', f.billed, 'Billed'], [WAITING[f.status] || 'k-ready', f.notBilled, WAITING[f.status] ? STATUS[f.status][0] : 'Not billed'], ['k-todo', Math.max(0, f.value - Math.max(f.delivered, f.billed)), 'Still to deliver']];
+const pbar = (segs, cls = '') => `<div class="pbar ${cls}" role="img" aria-label="${segs.map(([, v, l]) => `${l} ${rs(v)}`).join(', ')}">${segs.filter(x => x[1] > 0).map(([k, v]) => `<i class="${k}" style="flex:${v} 1 0"></i>`).join('')}</div>`;
+const subnav = cur => `<nav class="subnav" aria-label="Reports">${[['reports', 'Project Report'], ['schedule', 'Unbilled Schedule']].map(([k, l]) => `<a href="#${k}" ${k === cur ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
+function viewReports() {
+  const custs = [...new Set(state.pos.map(p => p.customer))];
+  if (!custs.includes(ui.cust)) ui.cust = '';
+  const rows = allFigs().filter(x => !ui.cust || x.p.customer === ui.cust).sort((a, b) => b.f.notBilled - a.f.notBilled || b.f.value - a.f.value);
+  const sum = fn => rows.reduce((t, x) => t + fn(x.f), 0);
+  const value = sum(f => f.value), delivered = sum(f => f.delivered), billed = sum(f => f.billed), notBilled = sum(f => f.notBilled);
+  const by = k => sum(f => f.status === k ? f.notBilled : 0), todo = sum(f => rowSegs(f)[2][1]);
+  const keys = [['k-billed', 'Billed', billed, `${pctOf(billed, value)}% of orders`], ['k-ready', 'Ready to bill', by('ready'), NEXT.ready], ['k-accept', 'Acceptance pending', by('acceptance'), NEXT.acceptance], ['k-invoice', 'Invoice due', by('invoice'), NEXT.invoice], ['k-todo', 'Still to deliver', todo, `${pctOf(todo, value)}% of orders`]];
+  const time = state.lastSync.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+  return `${subnav('reports')}
+  <header class="head"><div><h1>Project Report</h1><p class="muted">Every project from PO to final bill, from your POs, challans and Tally invoices. Last Tally sync at ${time}.</p></div>
+    <div class="head-right"><span><label class="sr" for="rep-cust">Customer</label><select class="mini-select" id="rep-cust"><option value="">All customers</option>${custs.map(c => `<option value="${esc(c)}" ${ui.cust === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></span><button class="btn" type="button" data-act="download">Download</button></div></header>
+  <div class="pad stack narrow">
+    ${reviewBanner()}
+    <section class="card" data-key="orderbook">
+      <div class="card-head"><h2>Where Your Orders Stand</h2><span class="muted">As on ${dstr(TODAY)}</span></div>
+      <div class="card-body">
+        <div>
+          <p class="cap">Orders in hand, ${plural(rows.length, 'project')}${ui.cust ? ` for ${esc(ui.cust)}` : ''}</p>
+          <p class="big" id="rep-orders">${rs(value)}</p>
+          <p class="muted" id="rep-line">${notBilled ? `${rs(notBilled)} is delivered but not billed.${by('ready') ? ` ${rs(by('ready'))} of it can be billed today.` : ''}` : 'Everything delivered so far is billed.'} All amounts before GST, at PO price.</p>
+        </div>
+        ${pbar(keys.map(([k, l, v]) => [k, v, l]), 'lg')}
+      </div>
+      <div class="figs keys card-foot" id="rep-keys">${keys.map(([k, l, v, sub]) => `<div class="fig" data-k="${k}"><span><i class="sw ${k}"></i>${l}</span><b>${rs(v)}</b><small>${sub}</small></div>`).join('')}</div>
+    </section>
+    <section class="card" data-key="projects">
+      <div class="card-head"><h2>Projects, Most to Bill First</h2><span class="muted">Open a project for its own report</span></div>
+      <div class="table-wrap"><table class="rtable" id="rep-table"><thead><tr><th class="l">Project</th><th class="l">Progress</th><th>PO value</th><th>Not billed</th><th class="l">Status</th></tr></thead><tbody>
+      ${rows.map(({ p, f }) => `<tr data-go="rep-${slug(p.id)}" data-key="prj-${slug(p.id)}">
+        <td class="lead l" data-label="Project"><b>${esc(p.customer)}</b><small><a class="plain" href="#rep-${slug(p.id)}">${esc(p.id)}</a> · ${TERMS[p.terms].short}</small></td>
+        <td class="l bar-cell" data-label="Progress">${pbar(rowSegs(f))}<small>Delivered ${pctOf(f.delivered, f.value)}% · Billed ${pctOf(f.billed, f.value)}%</small></td>
+        <td data-label="PO value">${rs(f.value)}</td>
+        <td data-label="Not billed"><b>${rs(f.notBilled)}</b></td>
+        <td class="l st-cell" data-label="Status"><span>${statusTag(f.status)}<small>${NEXT[f.status]}</small></span></td></tr>`).join('')}
+      <tr class="tot"><td class="lead l" data-label="Total">Total, ${plural(rows.length, 'project')}</td><td class="l bar-cell" data-label="Progress"><small>Delivered ${pctOf(delivered, value)}% · Billed ${pctOf(billed, value)}%</small></td><td data-label="PO value">${rs(value)}</td><td data-label="Not billed" id="rep-total">${rs(notBilled)}</td><td class="blank"></td></tr>
+      </tbody></table></div>
+    </section>
+  </div>`;
+}
+// Stages are done, in progress (now) or not started (later). Signed copies run beside billing, so more than one can be in progress.
+function stages(po, f) {
+  const T = TERMS[po.terms], n = f.ds.length, all = f.qtyDelivered >= po.qty, firstAll = Math.round(T.first / 100 * f.value);
+  const dueNow = Math.max(0, Math.round(T.first / 100 * f.delivered) - f.billed);
+  const st = (done, now) => done ? 'done' : now ? 'now' : 'later';  // not 'next': .next is the What's next box
+  const list = [
+    ['done', 'PO received', dstr(po.receivedOn)],
+    [st(all, true), 'Delivered', f.qtyDelivered ? `${pctOf(f.delivered, f.value)}%, ${plural(n, 'challan')}` : 'Not yet'],
+    [st(n && f.signed === n, n), 'Signed copies', n ? `${f.signed} of ${n} approved` : 'After delivery'],
+  ];
+  if (!T.accept) return [...list, [st(f.billed >= f.value, f.billed || f.notBilled), 'Billed', f.billed >= f.value ? 'In full' : f.notBilled ? `${rs(f.notBilled)} due now` : f.billed ? `${rs(f.billed)} of ${rs(f.value)}` : 'On delivery']];
+  return [...list,
+    [st(f.billed >= firstAll, f.billed || dueNow), `${T.first}% billed`, f.billed >= firstAll ? rs(firstAll) : dueNow ? `${rs(dueNow)} due now` : f.billed ? `${rs(f.billed)} of ${rs(firstAll)}` : 'On delivery'],
+    [st(po.acceptedOn, f.status === 'acceptance'), 'Acceptance', po.acceptedOn ? dstr(po.acceptedOn) : all ? 'Waiting for customer' : 'After delivery'],
+    [st(f.billed >= f.value, f.status === 'ready'), `${100 - T.first}% billed`, f.billed >= f.value ? 'Billed in full' : f.status === 'ready' ? `${rs(f.notBilled)} to bill now` : 'After acceptance'],
+  ];
+}
+function viewProject(po) {
+  const f = fig(po), T = TERMS[po.terms], segs = rowSegs(f), sg = stages(po, f), [msg] = nextStep(po, f);
+  const word = d => ({ approved: 'Approved', waiting: 'Waiting for approval', missing: 'Missing' })[copyState(d)];
+  return `${subnav('reports')}
+  <header class="head">
+    <div><p class="crumb"><a href="#reports">Project Report</a> › ${esc(po.id)}</p><h1>${esc(po.customer)}</h1></div>
+    <div class="head-right"><a class="btn" href="${poHref(po.id)}">Open PO</a><button class="btn" type="button" data-act="download">Download</button></div>
+  </header>
+  <div class="pad stack">
+    ${unmatched().some(i => i.customer === po.customer) ? reviewBanner() : ''}
+    <article class="paper report" id="project-doc" data-key="project">
+      <div class="rep-head"><p class="muted">${esc(CONSIGNOR.name)}</p><h2>Project Report</h2><p class="muted">${esc(po.customer)}, ${esc(po.id)}</p><p class="muted">As on ${dstr(TODAY)}. ${T.label}.</p></div>
+      <div class="figs" aria-label="Project figures">
+        <div class="fig"><span>PO value</span><b>${rs(f.value)}</b><small>${num(po.qty)} ${esc(po.unit)} of ${esc(po.item)}</small></div>
+        <div class="fig"><span>Delivered</span><b>${rs(f.delivered)}</b><small>${pctOf(f.delivered, f.value)}% of the PO</small></div>
+        <div class="fig"><span>Billed</span><b id="pr-billed">${rs(f.billed)}</b><small>${pctOf(f.billed, f.value)}% of the PO</small></div>
+        <div class="fig ${f.notBilled ? 'hot' : 'calm'}"><span>Not billed</span><b id="pr-notbilled">${rs(f.notBilled)}</b><small>${f.notBilled ? f.age + ' days old' : 'All clear'}</small></div>
+      </div>
+      <div class="sec">${pbar(segs, 'lg')}<ul class="legend">${segs.filter(x => x[1] > 0).map(([k, v, l]) => `<li><i class="${k}"></i>${l} : <b>${rs(v)}</b></li>`).join('')}</ul></div>
+      <ol class="steps" id="pr-steps" style="--n:${sg.length}" aria-label="Where this project stands">${sg.map(([x, t, d]) => `<li class="${x}"><span class="sr">${{ done: 'Done', now: 'In progress', later: 'Not started' }[x]}: </span><b>${t}</b><small>${d}</small></li>`).join('')}</ol>
+      <div class="next" id="pr-next"><div><span class="cap-up">What's next?</span><p>${msg}</p></div></div>
+      <section class="sec"><h2>Deliveries</h2>
+        ${f.ds.length ? `<div class="table-wrap"><table class="rtable"><thead><tr><th class="l">Challan#</th><th class="l">Date</th><th>Quantity</th><th>Value</th><th>Signed copy</th></tr></thead><tbody>
+        ${f.ds.map(d => `<tr><td class="lead l" data-label="Challan"><b>${esc(d.challan)}</b></td><td class="l nowrap" data-label="Date">${dstr(d.date)}</td><td data-label="Quantity">${num(d.qty)} ${esc(po.unit)}</td><td data-label="Value">${rs(d.qty * po.rate)}</td><td data-label="Signed copy">${word(d)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">No delivery logged yet.</p>'}
+      </section>
+      <section class="sec"><h2>Invoices from Tally</h2>
+        ${f.inv.length ? `<div class="table-wrap"><table class="rtable"><thead><tr><th class="l">Invoice#</th><th class="l">Date</th><th>Amount</th></tr></thead><tbody>
+        ${f.inv.map(i => `<tr><td class="lead l nowrap" data-label="Invoice"><b>${esc(i.no)}</b></td><td class="l nowrap" data-label="Date">${dstr(i.date)}</td><td data-label="Amount">${rs(i.amount)}</td></tr>`).join('')}
+        <tr class="tot"><td class="blank" colspan="2">Total billed</td><td data-label="Total billed">${rs(f.billed)}</td></tr></tbody></table></div>` : '<p class="muted">No invoice found in Tally yet.</p>'}
+      </section>
+      <p class="doc-note">All amounts before GST, at PO price. Built from this PO, its challans and the Tally invoices matched to it.</p>
+    </article>
+  </div>`;
+}
+
 /* ---------- render and routing ---------- */
 const SCREENS = {
   overview: { label: 'Home', short: 'Home', ic: 'overview', view: viewOverview },
   'purchase-orders': { label: 'Purchase Orders', short: 'POs', ic: 'pos', view: viewPOs },
   challans: { label: 'Signed Challans', short: 'DCs', ic: 'signed', view: viewChallans },
   tally: { label: 'Tally Invoices', short: 'Tally', ic: 'tally', view: viewTally },
-  schedule: { label: 'Unbilled Schedule', short: 'Schedule', ic: 'schedule', view: viewSchedule },
+  reports: { label: 'Reports', short: 'Reports', ic: 'schedule', view: viewReports },
+  // The schedule is one of the reports: it opens from the Reports tabs and keeps Reports lit in the menu.
+  schedule: { label: 'Unbilled Schedule', short: 'Schedule', ic: 'schedule', view: viewSchedule, under: 'reports' },
 };
 const $ = id => document.getElementById(id);
 function render() {
-  const h = ui.route, isNew = h === 'new-po';
-  const po = SCREENS[h] || isNew ? null : state.pos.find(p => slug(p.id) === h);
-  const key = SCREENS[h] ? h : po || isNew ? 'purchase-orders' : 'overview';
-  $('main').innerHTML = `<div class="wrap">${isNew ? formAddPO() : SCREENS[h] ? SCREENS[h].view() : po ? viewPO(po) : viewOverview()}</div>`;
+  const h = ui.route, isNew = h === 'new-po', isRep = h.startsWith('rep-');
+  // A project report's address is rep- plus its PO's address, so no PO or screen can ever take it.
+  const rep = isRep ? state.pos.find(p => 'rep-' + slug(p.id) === h) : null;
+  const po = SCREENS[h] || isNew || isRep ? null : state.pos.find(p => slug(p.id) === h);
+  const key = SCREENS[h] ? SCREENS[h].under || h : isRep ? 'reports' : po || isNew ? 'purchase-orders' : 'overview';
+  $('main').innerHTML = `<div class="wrap">${isNew ? formAddPO() : SCREENS[h] ? SCREENS[h].view() : rep ? viewProject(rep) : isRep ? viewReports() : po ? viewPO(po) : viewOverview()}</div>`;
   document.querySelectorAll('img[data-copy]').forEach(i => { i.src = copySrc(byDC(i.dataset.copy)); });
   const badge = { tally: unmatched().length, challans: state.deliveries.filter(d => copyState(d) === 'waiting').length };
-  $('nav').innerHTML = Object.entries(SCREENS).map(([k, s]) => `<a href="#${k}" ${k === key ? 'aria-current="page"' : ''}>${icon(s.ic)}<span class="nl">${s.label}</span><span class="ns">${s.short}</span>${badge[k] ? `<span class="count">${badge[k]}</span>` : ''}</a>`).join('');
+  $('nav').innerHTML = Object.entries(SCREENS).filter(([, x]) => !x.under).map(([k, s]) => `<a href="#${k}" ${k === key ? 'aria-current="page"' : ''}>${icon(s.ic)}<span class="nl">${s.label}</span><span class="ns">${s.short}</span>${badge[k] ? `<span class="count">${badge[k]}</span>` : ''}</a>`).join('');
   $('live-total').textContent = rs(totals().notBilled);
   if (ui.flash) {
     const el = document.querySelector(`[data-key="${ui.flash}"]`);
@@ -1018,6 +1173,8 @@ const STEPS = [
     act() { const po = poById(DEMO_PO); if (!po.acceptedOn) { po.acceptedOn = TODAY; po.acceptSeq = state.seq++; } ui.flash = 'status'; go(slug(DEMO_PO)); toast(`Ready to bill: ${rs(fig(po).notBilled)}.`); } },
   { who: 'Accounts team', title: 'Bill the balance', text: 'The last 25% is invoiced in Tally, and the PO closes at 100%.', btn: 'Raise invoice and sync',
     act() { billDemo(1); ui.flash = 'status'; go(slug(DEMO_PO)); toast(`${DEMO_PO} is fully billed.`); } },
+  { who: 'Owner', title: 'Every project on one page', text: 'Each project from PO to final bill, with what is billed, what is waiting and who acts next. Open one for its own report.', btn: 'Open the project report',
+    act() { ui.cust = ''; ui.flash = 'orderbook'; go('reports'); } },
   { who: 'CA and bank', title: 'A clean schedule at month end', text: 'Every unbilled delivery at sale value, with its age and reason. Only those with an approved signed challan count. Your CA reviews it first.', btn: 'Open the schedule', act() { ui.flash = 'schedule'; go('schedule'); } },
   { who: 'End of demo', title: 'That is the full cycle', text: 'Click around freely, or run it again from the start.', btn: 'Restart demo', act() { restart(); } },
 ];
@@ -1036,7 +1193,7 @@ function renderGuide() {
 }
 function restart() {
   state = seed();
-  Object.assign(ui, { minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [] });
+  Object.assign(ui, { minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [], cust: '' });
   $('top-q').value = '';
   guide.i = 0;
   renderGuide();
@@ -1056,6 +1213,7 @@ const ACTIONS = {
   preview: a => { const v = a.dataset.v; ui.preview = ui.route === 'challans' && ui.preview === v ? null : v; ui.flash = ui.preview ? 'preview' : null; go('challans'); },
   'sample-copies': () => { const miss = state.deliveries.filter(d => copyState(d) === 'missing'); miss.forEach(d => { d.copy = { name: 'Sample copy', src: sampleSrc(d), on: TODAY, seq: state.seq++ }; }); render(); toast(`Sample copy added to ${plural(miss.length, 'challan')}, waiting for approval.`); },
   'discard-file': a => { ui.loose.splice(+a.dataset.v, 1); render(); },
+  download: () => toast('In the full product this report downloads as PDF or Excel.'),
   sync: () => { const r = sync(); render(); toast(r.n ? `Synced ${plural(r.n, 'invoice')}: ${r.auto} matched, ${r.review} to review.` : 'Nothing new in Tally.'); },
   'guide-next': () => { $('toast').hidden = true; const last = guide.i === STEPS.length - 1; STEPS[guide.i].act(); if (last) return; guide.i++; renderGuide(); },
   'guide-restart': () => restart(),
@@ -1110,6 +1268,7 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   if (e.target.id === 'po-status') { ui.st = e.target.value; $('po-rows').innerHTML = poRows(); }
   if (e.target.id === 'age-filter') { ui.minAge = +e.target.value; render(); $('age-filter').focus(); }
+  if (e.target.id === 'rep-cust') { ui.cust = e.target.value; render(); $('rep-cust').focus(); }
   if (e.target.type === 'file' && e.target.files.length) attachFiles([...e.target.files], e.target.dataset.dc || null);
 });
 // Files dropped on the upload box are attached. Anywhere else the browser would open them, so that is stopped.
