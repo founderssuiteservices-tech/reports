@@ -213,12 +213,14 @@ details.twin summary::-webkit-details-marker{display:none}
 .ow-k b{font-weight:600;color:var(--label)}
 
 /* indicators */
-.sigs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0 -10px}
+.sigs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0 -10px;align-items:start}
 .sig{display:block;padding:10px;border-radius:14px;transition:background-color .2s}
 .sig .sl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sig .v{display:block;font-size:22px;font-weight:600;letter-spacing:-.01em;margin:2px 0 3px;white-space:nowrap}
-.sig .w{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--label2);min-width:0}
-.sig .w span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sig .w{display:flex;align-items:flex-start;gap:5px;font-size:12px;line-height:16px;color:var(--label2);min-width:0}
+.sig .w svg{flex:none;margin-top:1px}
+.sig .w span{min-width:0}
+.sig .sig-m{display:block;margin-top:5px;font-size:12px;line-height:1.35;color:var(--label2)}
 
 /* projects */
 .hero-p{font-size:56px;line-height:1.04;font-weight:700;letter-spacing:-.02em;margin:14px 0 2px;white-space:nowrap}
@@ -651,20 +653,22 @@ const unmoved = () => { const c = B.stock.filter(s => s.close[N - 1] === s.open)
 const owedUs = () => { const rows = B.projects.map((p, i) => ({i, name: p.name, due: p.due, tot: sum(p.due), od: sum(p.due.slice(1))})); return {rows, tot: sum(rows, x => x.tot), od: sum(rows, x => x.od), old: sum(rows, x => x.due[4]), buckets: [0, 1, 2, 3, 4].map(i => sum(rows, x => x.due[i]))}; };
 const weOwe = () => ({rows: B.weOwe, tot: sum(B.weOwe, x => x[1] + x[2]), od: sum(B.weOwe, x => x[2])});
 const needTenders = () => { const y = P(YEAR), lo = y.over / PLAN[1], hi = y.over / PLAN[0]; return {lo, hi, a: Math.max(0, Math.ceil((lo - y.sales) / TENDER)), b: Math.max(0, Math.ceil((hi - y.sales) / TENDER))}; };
+const lim = (s, a, b) => ({good: `under the ${a} limit`, warn: `over the ${a} limit`, bad: `over ${b}`})[s];  // at()'s three states in words
 function signals(r) {
   const p = P(r), y = P(YEAR), u = owedUs(), stuck = unmoved();
   const alone = p.net - branches(r), lo = p.over / PLAN[1], hi = p.over / PLAN[0], sal = inR(byRaw.Salaries, r) / p.sales, swing = inR(byRaw["RATE DIFFRANCE"], r) / p.purch, fin = inR(byRaw["Financial Expenses"], r) / p.sales;
   const days = (p.cos + p.direct) ? p.close / ((p.cos + p.direct) / p.days) : 0, collect = u.tot / (y.sales / y.days), stuckShare = stuck.v / stockAt(N - 1);
+  const sg = gmStatus(p.gm), sp = at(sal, PLAN[0], PLAN[1]), sw = at(swing, .01, .02), sf = at(fin, .02, .04), sd = at(days, 60, 120), sk = at(stuckShare, .2, .4), sc = at(collect, 60, 120);
   return [
-    {n: "gross", t: "Gross margin", v: pct(p.gm), s: gmStatus(p.gm), w: "plan 14–18%"},
-    {n: "mumbai", t: "Mumbai alone", v: short(alone), s: alone >= 0 ? "good" : "bad", w: "before branches"},
-    {n: "breakeven", t: "Break-even sales", v: `${short(lo)}–${short(hi).replace("₹", "")}`.replace(/ (Cr|L)–/, (m, u) => short(lo).endsWith(u) && short(hi).endsWith(u) ? "–" : m), s: p.sales >= hi ? "good" : "warn", w: `billed ${short(p.sales)}`},
-    {n: "people", t: "Salaries to sales", v: pct(sal), s: at(sal, PLAN[0], PLAN[1]), w: "limit 14%"},
-    {n: "swing", t: "Rate difference", v: pct(swing, 2), s: at(swing, .01, .02), w: "of purchases"},
-    {n: "finance", t: "Finance cost", v: pct(fin, 2), s: at(fin, .02, .04), w: "of sales"},
-    {n: "stockdays", t: "Stock days", v: Math.round(days).toString(), s: at(days, 60, 120), w: "limit 60"},
-    {n: "stuck", t: "Stock not moved", v: short(stuck.v), s: at(stuckShare, .2, .4), w: `${pct(stuckShare, 0)} of stock`},
-    {n: "collect", t: "Days to collect", v: Math.round(collect).toString(), s: at(collect, 60, 120), w: "limit 60"}
+    {n: "gross", t: "Gross margin", v: pct(p.gm), s: sg, w: {good: "14% or more", warn: "under the 14% plan", bad: "below zero"}[sg], m: "What's left of sales after material and direct costs"},
+    {n: "mumbai", t: "Mumbai alone", v: short(alone), s: alone >= 0 ? "good" : "bad", w: alone >= 0 ? "a profit before branch money" : "a loss before branch money", m: "Mumbai's profit before branch profit is moved in"},
+    {n: "breakeven", t: "Break-even sales", v: `${short(lo)}–${short(hi).replace("₹", "")}`.replace(/ (Cr|L)–/, (m, u) => short(lo).endsWith(u) && short(hi).endsWith(u) ? "–" : m), s: p.sales >= hi ? "good" : "warn", w: `billed ${short(p.sales)}, ${p.sales >= hi ? "past it" : "not past it yet"}`, m: "Sales that cover overheads at a 14–18% margin"},
+    {n: "people", t: "Salaries to sales", v: pct(sal), s: sp, w: lim(sp, "14%", "18%"), m: "Salaries as a share of sales"},
+    {n: "swing", t: "Rate difference", v: pct(swing, 2), s: sw, w: lim(sw, "1%", "2%"), m: "Rate differences booked, as a share of purchases"},
+    {n: "finance", t: "Finance cost", v: pct(fin, 2), s: sf, w: lim(sf, "2%", "4%"), m: "Bank interest and charges, as a share of sales"},
+    {n: "stockdays", t: "Stock days", v: `${Math.round(days)} days`, s: sd, w: lim(sd, "60-day", "120 days"), m: "How many days the stock in hand would last at today's pace"},
+    {n: "stuck", t: "Stock not moved", v: short(stuck.v), s: sk, w: `${pct(stuckShare, 0)} of stock, ${lim(sk, "20%", "40%")}`, m: "Stock that hasn't moved since 1 April"},
+    {n: "collect", t: "Days to collect", v: `${Math.round(collect)} days`, s: sc, w: lim(sc, "60-day", "120 days"), m: "How many days customers take to pay us, on average"}
   ];
 }
 
@@ -845,7 +849,7 @@ function company() {
     <div class="card dnc reveal" style="--i:5"><header><h2>Where the money went</h2><p>Tap a slice to go deeper</p></header>${donut(r)}</div>
     <div class="card reveal" style="--i:6"><header><h2>Income and expenses</h2><p>Tap a month to see it above. Income includes branch profit and other income</p></header>${bars()}</div></div>
   <div class="g57">${owedCard()}
-    <div class="card" id="sigs"><header><h2>Indicators</h2><p>From Mumbai's book. Each one is a formula and a decision. Tap to see both</p></header><div class="sigs">${signals(r).map(x => `<button class="sig" data-n="${x.n}"><span class="sl">${esc(x.t)}</span><span class="v">${esc(x.v)}</span><span class="w">${IC[x.s]}<span>${ST[x.s]} · ${esc(x.w)}</span></span></button>`).join("")}</div></div></div>`;
+    <div class="card" id="sigs"><header><h2>Indicators</h2><p>From Mumbai's book. Each one is a formula and a decision. Limits are starting points until Accounts sets yours. Tap to see both</p></header><div class="sigs">${signals(r).map(x => `<button class="sig" data-n="${x.n}"><span class="sl">${esc(x.t)}</span><span class="v">${esc(x.v)}</span><span class="w">${IC[x.s]}<span>${ST[x.s]}: ${esc(x.w)}</span></span><span class="sig-m">${esc(x.m)}</span></button>`).join("")}</div></div></div>`;
 }
 function bullet(m, plan, k) {
   const x = v => clamp(v / .25, 0, 1) * 100;
