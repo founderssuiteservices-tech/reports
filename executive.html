@@ -62,6 +62,7 @@ svg{flex:none;display:block}
 .seg.glass{background:var(--glass);padding:3px}
 .seg button{position:relative;z-index:1;height:32px;padding:0 16px;border-radius:999px;font-size:13px;font-weight:500;color:var(--label);white-space:nowrap}
 .seg button[aria-pressed="true"]{font-weight:600}
+.seg a{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 16px;border-radius:999px;font-size:13px;font-weight:500;color:var(--label);white-space:nowrap}.seg a:hover{text-decoration:none}  /* Stock: the TrackBill page */
 .seg .thumb{position:absolute;z-index:0;top:2px;bottom:2px;left:0;width:0;border-radius:999px;background:var(--thumb);box-shadow:var(--thumb-sh);transition:transform .34s var(--ease),width .34s var(--ease)}
 .seg.glass .thumb{top:3px;bottom:3px}
 .seg:not(.ready) .thumb{transition:none}
@@ -532,7 +533,7 @@ code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--fill
 @media (max-width:860px){  /* five views don't fit beside Back and the tag, so they get a row of their own */
   .nav-in{height:auto;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"back . right" "seg seg seg";gap:8px;padding-top:8px;padding-bottom:8px}
   .back{grid-area:back}.nav-r{grid-area:right}
-  #vseg{grid-area:seg;justify-self:stretch;display:flex}#vseg button{flex:1 1 0;min-width:0;padding:0 2px;text-align:center}
+  #vseg{grid-area:seg;justify-self:stretch;display:flex}#vseg button,#vseg a{flex:1 1 0;min-width:0;padding:0 2px;text-align:center}
   html{scroll-padding-top:116px}
 }
 @media (max-width:734px){
@@ -541,8 +542,9 @@ code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--fill
   .wr .t small{display:block;margin-top:2px;font-size:12px;color:var(--label2)}
   .cols.m12 small{font-size:0}.cols.m12 small::after{content:attr(data-s);font-size:11px}
 }
+@media (max-width:430px){#vseg button,#vseg a{flex:1 1 auto}}  /* six tabs on a phone: long labels take the room they need */
 @media (max-width:370px){
-  .seg button{padding:0 8px;font-size:12px}
+  .seg button,.seg a{padding:0 8px;font-size:12px}
   .tag{padding:0 7px}
   .sv{font-size:18px}
 }
@@ -558,7 +560,7 @@ code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--fill
 <body class="first">
 <nav class="nav" id="nav"><div class="wrap nav-in">
   <a class="back glass" href="index.html" aria-label="Back to tenders" onclick="if(document.referrer.startsWith(location.origin)&&history.length>1){history.go(-(history.state?.d||0)-1);return false}"><svg viewBox="0 0 8 14" width="8" height="14" aria-hidden="true"><path d="M7 1L1 7l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Tenders</span></a>
-  <div class="seg glass" id="vseg" role="group" aria-label="View"><span class="thumb"></span><button data-view="company">Company</button><button data-view="projects">Projects</button><button data-view="sales">Sales</button><button data-view="weekly">Weekly</button><button data-view="accounts">Accounts</button></div>
+  <div class="seg glass" id="vseg" role="group" aria-label="View"><span class="thumb"></span><button data-view="company">Company</button><button data-view="projects">Projects</button><button data-view="sales">Sales</button><button data-view="weekly">Weekly</button><button data-view="accounts">Accounts</button><a href="stock.html">Stock</a></div>
   <div class="nav-r"><span class="tag" title="These are invented amounts, not your books"><i></i><span>Sample figures</span></span>
     <button class="icon-btn glass" data-act="theme" aria-label="Switch light or dark"><svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
 </div></nav>

@@ -1,0 +1,1132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<style>
+.back-exec{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;width:92px;height:30px;margin-right:10px;padding:0;border:1px solid var(--line);border-radius:6px;color:var(--head);font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap}
+.back-exec:hover{background:#f4f5f9;text-decoration:none}
+.back-exec+.brand{flex-basis:calc(var(--side-w) - 16px - 102px)}  /* the brand still ends where the menu does */
+@media (max-width:860px){.back-exec{width:auto;margin-right:10px;padding:0 8px}.back-exec span{display:none}.back-exec+.brand{flex-basis:auto;margin-right:auto}}
+@media (max-width:360px){.back-exec+.brand #logo{display:none!important}}  /* room for the money at 320 px */
+</style>
+<title>TrackBill Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+/* One light theme on purpose: white pages, thin lines, one blue, 13 px Inter, no card shadows.
+   The top bar and left menu hold the four places people work. The demo guide is a slim bar docked at the bottom, so it never covers the work. */
+:root{
+  color-scheme:light;
+  --top-h:48px;--side-w:224px;--guide-h:72px;--tabs-h:0px;
+  --gl:24px;--gr:max(24px,env(safe-area-inset-right,0px));
+  --fg:#21263c;--head:#212529;--label:#4c526c;--muted:#5f6480;--th:#6c718a;
+  --line:#e6e7ef;--line-2:#d3d5e0;--band:#f9f9fb;--side:#f7f7fe;--hover:#f4f5fb;--current:#eef1fd;
+  --blue:#1f6fe5;--blue-2:#1a5fc7;--link:#1c5bd9;
+  --green:#0d7647;--orange:#c2410c;--red:#c62828;
+  --amber-bg:#fff8eb;--amber-line:#f1dcb3;--amber-fg:#7a4b00;--green-bg:#f0f9f4;--green-line:#cfe9da;
+  --a0:#8fb8f5;--a1:#5b97ee;--a2:#2b6fdb;--a3:#174a9e;
+  --font:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%235f6480' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E");
+  --chev-blue:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%231c5bd9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 5.25 7 8.75l3.5-3.5'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff}
+body{color:var(--fg);font:400 13px/1.5 var(--font);letter-spacing:.2px;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:#fff}
+[hidden]{display:none!important}
+h1,h2,p,ul,ol,dl,dd{margin:0;padding:0}
+h1{font-size:18px;font-weight:600;line-height:1.3;color:var(--head)}
+h2{font-size:14px;font-weight:600;line-height:1.35;color:var(--head)}
+b{font-weight:600}
+small{font-size:12px}
+a{color:inherit}
+button,input,select{font:inherit;letter-spacing:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+main:focus{outline:none}
+.ic{flex:none}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.plain{color:var(--link);font-weight:500;text-decoration:none}
+.plain:hover{text-decoration:underline}
+.link{background:none;border:0;padding:0;color:var(--link);font-weight:500;cursor:pointer}
+.link:hover{text-decoration:underline}
+
+/* Shell */
+.app{display:grid;grid-template-columns:var(--side-w) minmax(0,1fr);grid-template-rows:var(--top-h) minmax(0,1fr);min-height:100vh}
+.top{grid-column:1/-1;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;height:var(--top-h);display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--line);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:var(--gr)}
+.brand{flex:0 0 calc(var(--side-w) - 16px);display:flex;align-items:center;gap:8px;min-width:0;text-decoration:none}
+.brand-name{font-size:14px;font-weight:600;line-height:1.15;color:var(--head)}
+.brand-name small{display:block;font-size:11px;font-weight:400;color:var(--muted)}
+.search{flex:0 1 360px;margin-left:24px;display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;min-width:0;border:1px solid transparent;border-radius:5px;background:#f4f5f9;color:var(--muted)}
+.search:focus-within{background:#fff;border-color:#408dfb}
+.search input{flex:1;min-width:0;height:auto;padding:0;border:0;background:none;outline:0;color:var(--fg)}
+.search input::placeholder{color:var(--muted);opacity:1}
+.search input::-webkit-search-cancel-button{display:none}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:16px;min-width:0;padding-left:16px}
+.money{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.money span{font-size:12px;color:var(--muted)}
+.money b{font-size:14px;color:var(--head)}
+.org{padding-left:16px;border-left:1px solid var(--line);white-space:nowrap;color:var(--label)}
+.plus{display:grid;place-items:center;width:30px;height:30px;border-radius:5px;background:var(--blue);color:#fff}
+.plus:hover{background:var(--blue-2)}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--top-h));height:calc(100vh - var(--top-h) - env(safe-area-inset-top,0px));display:flex;flex-direction:column;padding:10px;padding-left:max(10px,env(safe-area-inset-left,0px));background:var(--side);border-right:1px solid var(--line)}
+#nav{display:grid;gap:2px}
+#nav a{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:5px;text-decoration:none;color:var(--fg)}
+#nav a:hover{background:#ebedf9}
+#nav a[aria-current="page"]{background:var(--blue);color:#fff;font-weight:600}
+.ns{display:none}
+#nav .count{margin-left:auto;min-width:18px;height:18px;padding:0 5px;display:grid;place-items:center;border-radius:9px;background:#fdece0;color:#9a3412;font-size:11px;font-weight:600}
+#nav a[aria-current="page"] .count{background:#fff;color:var(--link)}
+.side-note{margin-top:auto;padding:10px;font-size:12px;color:var(--muted)}
+main{min-width:0;padding-bottom:calc(var(--guide-h) + 32px)}
+.wrap{min-width:0}
+.head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;min-height:60px;padding:10px var(--gr) 10px var(--gl);border-bottom:1px solid var(--line)}
+.head>div{min-width:0}
+.head-right{display:flex;align-items:center;gap:14px}
+.close{display:grid;place-items:center;width:28px;height:28px;border-radius:5px;color:var(--red)}
+.close:hover{background:var(--hover)}
+.pad{padding:20px var(--gr) 0 var(--gl)}
+.stack{display:grid;gap:20px;min-width:0}
+.narrow{max-width:1180px}
+
+/* Pieces */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:33px;padding:0 12px;border:1px solid var(--line-2);border-radius:5px;background:#fff;color:var(--fg);font-weight:500;text-decoration:none;white-space:nowrap;cursor:pointer}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-2);border-color:var(--blue-2)}
+.btn.sm{height:27px;padding:0 10px;font-size:12px}
+.st{font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.s-awaiting{color:var(--muted)}
+.s-invoice,.s-acceptance,.age-warn{color:var(--orange)}
+.s-ready{color:var(--link)}
+.s-part,.s-done{color:var(--green)}
+.s-ahead,.age-late{color:var(--red)}
+.card{min-width:0;background:#fff;border:1px solid var(--line);border-radius:6px}
+.card-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;min-height:44px;padding:8px 16px;background:var(--band);border-bottom:1px solid var(--line);border-radius:5px 5px 0 0}
+.card-body{display:grid;gap:14px;padding:16px;min-width:0}
+.banner{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;border:1px solid var(--amber-line);border-radius:6px;background:var(--amber-bg);color:var(--amber-fg)}
+.banner a{color:var(--link);font-weight:500;white-space:nowrap}
+.banner.good{border-color:var(--green-line);background:var(--green-bg);color:var(--green)}
+.cap-up{font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--th)}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));row-gap:12px;overflow:hidden}
+.fig{min-width:0;margin-left:-1px;padding:2px 16px;border-left:1px solid var(--line)}
+.fig span{display:block;font-size:12.5px;color:var(--label)}
+.fig b{display:block;width:fit-content;font-size:15px;font-weight:500;color:var(--head)}
+.fig small{display:block;color:var(--muted);overflow-wrap:anywhere}
+.fig.hot b{color:var(--orange);font-weight:600}
+.fig.calm b{color:var(--green);font-weight:600}
+.box-figs{padding:14px 0}
+.summary{padding:12px 0 12px}
+.summary .cap-up{padding:0 16px 8px}
+
+/* Home */
+.big{font-size:26px;font-weight:500;line-height:1.25;letter-spacing:0;color:var(--head);font-variant-numeric:normal}
+.cap{font-size:14px;color:var(--label)}
+.seg{display:flex;gap:2px;height:14px}
+.seg:empty{background:var(--line);border-radius:3px}
+.seg i{display:block;min-width:3px;border-radius:3px}
+.a0{background:var(--a0)}.a1{background:var(--a1)}.a2{background:var(--a2)}.a3{background:var(--a3)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 24px;list-style:none}
+.legend li{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.legend i{width:10px;height:10px;border-radius:2px}
+.legend b{font-weight:500;color:var(--head)}
+.card-foot{padding:12px 0;border-top:1px solid var(--line)}
+.home-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:20px;align-items:start;min-width:0}
+.kv{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px}
+.kv b{font-weight:500;color:var(--head)}
+.mini-select{width:auto;height:28px;padding:0 20px 0 0;border:0;background:transparent var(--chev-blue) no-repeat right center;color:var(--link);font-weight:500;field-sizing:content;cursor:pointer}
+.title-select{width:auto;max-width:100%;height:auto;min-height:33px;padding:0 24px 0 0;border:0;background:transparent var(--chev-blue) no-repeat right center;font-size:18px;font-weight:600;color:var(--head);field-sizing:content;cursor:pointer}
+
+/* Tables: rows become label and value pairs on a phone, so no column is ever hidden */
+.table-wrap{overflow-x:auto;min-width:0}
+.rtable{width:100%;border-collapse:collapse;--cl:12px;--cr:12px}
+.card .rtable{--cl:16px;--cr:16px}
+.rtable.edge{--cl:var(--gl);--cr:var(--gr)}
+.rtable th{padding:9px 12px 8px;background:var(--band);border-block:1px solid var(--line);color:var(--th);font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;text-align:right;white-space:nowrap}
+.card .rtable th{border-top:0}
+.rtable td{padding:14px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+.card .rtable tbody tr:last-child td{border-bottom:0}
+.rtable .l{text-align:left}
+.rtable td small{display:block;color:var(--muted)}
+.rtable td b{color:var(--head)}
+.rtable tbody tr[data-go]{cursor:pointer}
+.rtable tbody tr[data-go]:hover{background:var(--hover)}
+.nowrap{white-space:nowrap}
+.rtable .tot td{font-weight:600;color:var(--head);background:var(--band)}
+.rtable .blank{color:var(--label)}
+@media (min-width:761px){
+  .rtable th:first-child,.rtable td:first-child{padding-left:var(--cl)}
+  .rtable th:last-child,.rtable td:last-child{padding-right:var(--cr)}
+}
+@media (max-width:760px){
+  .rtable{--cl:0px;--cr:0px}
+  .card .rtable{--cl:16px;--cr:16px}
+  .rtable.edge{--cl:var(--gl);--cr:var(--gr)}
+  .rtable thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .rtable,.rtable tbody,.rtable td{display:block;width:100%}
+  .rtable tr{display:flex;flex-direction:column;padding:12px var(--cr) 12px var(--cl);border-top:1px solid var(--line)}
+  .rtable td{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:3px 0;border:0!important;text-align:right}
+  .rtable td::before{content:attr(data-label);flex:none;max-width:48%;color:var(--muted);text-align:left}
+  .rtable td.lead{display:block;order:-1;padding-bottom:6px;text-align:left}
+  .rtable td.lead::before{content:none}
+  .rtable td.blank{display:none}
+  .rtable .tot{border-top:2px solid var(--line-2);background:var(--band)}
+  .rtable .tot td{background:none}
+}
+
+/* Forms: label on the left, field on the right */
+input,select{width:100%;height:33px;padding:0 10px;border:1px solid var(--line-2);border-radius:5px;background:#fff;color:var(--fg)}
+select{appearance:none;padding-right:28px;background:#fff var(--chev) no-repeat right 10px center;cursor:pointer}
+input[type="number"]{appearance:textfield}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{appearance:none;margin:0}
+input:focus,select:not(.title-select,.mini-select):focus{border-color:#408dfb;outline:2px solid rgba(64,141,251,.25);outline-offset:0}
+.search input:focus{outline:0}
+.num{text-align:right}
+.row{display:grid;grid-template-columns:170px minmax(0,380px);align-items:center;gap:4px 16px}
+.row small{display:block;margin-top:3px}
+label.req{color:var(--red)}
+.form-page{max-width:920px}
+.item-table th:nth-child(2){width:96px}
+.item-table th:nth-child(3){width:120px}
+.item-table th:nth-child(4){width:84px}
+.item-table th:nth-child(5){width:96px}
+.item-table th:nth-child(6){width:120px}
+.item-table td{padding:10px 6px;vertical-align:middle}
+.form-total{display:flex;justify-content:flex-end;gap:32px;padding:12px;background:var(--band);border-radius:5px;color:var(--head)}
+.form-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
+.err{color:var(--red);font-weight:500}
+.err:empty{display:none}
+
+/* Split view on a PO */
+.split{display:grid;grid-template-columns:320px minmax(0,1fr);margin-bottom:calc(-1*(var(--guide-h) + 32px))}
+.split-list{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--top-h));align-self:start;height:calc(100vh - var(--top-h) - var(--guide-h) - env(safe-area-inset-top,0px));overflow-y:auto;border-right:1px solid var(--line)}
+.sl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:60px;padding:10px 16px 10px var(--gl);border-bottom:1px solid var(--line)}
+.sl-row{display:grid;gap:2px;padding:12px 16px 12px var(--gl);border-bottom:1px solid var(--line);text-decoration:none}
+.sl-row:hover{background:var(--hover)}
+.sl-row[aria-current]{background:var(--current)}
+.sl-top{display:flex;justify-content:space-between;gap:10px}
+.sl-name{min-width:0;font-weight:500;overflow-wrap:anywhere;color:var(--head)}
+.sl-top b{font-weight:500;color:var(--head)}
+.sl-sub{font-size:12px;color:var(--muted)}
+.split-main{min-width:0;padding-bottom:calc(var(--guide-h) + 32px)}
+.actionbar{display:flex;flex-wrap:wrap;padding-left:calc(var(--gl) - 14px);padding-right:var(--gr);background:var(--band);border-bottom:1px solid var(--line)}
+.bar-btn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border:0;border-right:1px solid var(--line);background:none;color:var(--fg);cursor:pointer;white-space:nowrap}
+.bar-btn:hover:not(:disabled){background:#eff0f6}
+.bar-btn:disabled{color:var(--muted);cursor:default}
+.detail{max-width:900px}
+.next{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:12px 16px;border:1px solid var(--line);border-radius:6px}
+.next>div{min-width:0;flex:1 1 280px}
+.sec{display:grid;gap:8px;min-width:0}
+.tl{list-style:none;display:grid}
+.tl li{display:grid;grid-template-columns:88px minmax(0,1fr);gap:0 14px}
+.tl .when{font-size:12px;line-height:19.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.tl .what{position:relative;padding:0 0 14px 16px;border-left:1px solid var(--line-2)}
+.tl .what::before{content:"";position:absolute;left:-4px;top:6px;width:7px;height:7px;border-radius:50%;background:var(--a1)}
+.tl li:last-child .what{padding-bottom:0}
+.tl small{display:block;color:var(--muted)}
+
+/* Documents */
+.paper{position:relative;overflow:hidden;display:grid;gap:18px;min-width:0;padding:clamp(20px,4vw,36px);background:#fff;border:1px solid var(--line);border-radius:3px;box-shadow:0 0 8px rgba(33,38,60,.06)}
+.paper.ribboned{padding-top:48px}
+.ribbon{position:absolute;top:13px;left:-31px;width:112px;padding:2px 0;transform:rotate(-45deg);background:var(--muted);color:#fff;font-size:11px;font-weight:500;text-align:center}
+.doc-top,.doc-mid{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px}
+.doc-from,.doc-to{min-width:0;overflow-wrap:anywhere}
+.doc-from b,.doc-to b{display:block;color:var(--head)}
+.doc-title{text-align:right}
+.doc-title h2{font-size:24px;font-weight:400;line-height:1.2;letter-spacing:.6px;text-transform:uppercase}
+.label{display:block;font-size:12px;color:var(--muted)}
+.doc-meta{display:grid;grid-template-columns:auto auto;gap:3px 16px;justify-content:end;align-content:start}
+.doc-meta dt{color:var(--muted);text-align:right}
+.sign{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:18px 40px;padding-top:24px}
+.sign div{padding-top:6px;border-top:1px solid var(--line-2);font-size:12px;color:var(--muted)}
+.doc-note{font-size:12px;color:var(--muted);max-width:75ch}
+.report{max-width:1040px;margin-inline:auto}
+@media (min-width:761px){.paper.report{padding-inline:24px}.report .rtable th,.report .rtable td{padding-inline:8px}}
+.rep-head{display:grid;gap:2px;justify-items:center;text-align:center}
+.rep-head h2{font-size:18px;font-weight:500}
+.stamp{margin-top:6px;padding:2px 8px;border:1px solid var(--amber-line);border-radius:3px;background:var(--amber-bg);color:var(--amber-fg);font-size:11px;font-weight:500}
+.rep-lines{display:grid;justify-self:end;width:min(100%,520px)}
+.rep-lines p{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--line)}
+.rep-lines span{color:var(--label)}
+.rep-lines b{font-weight:500;color:var(--head)}
+.rep-lines .strong span,.rep-lines .strong b{font-weight:600;color:var(--head)}
+
+/* Tally */
+.review{border-color:var(--amber-line)}
+.review .card-head{background:var(--amber-bg);border-color:var(--amber-line)}
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px) auto;align-items:end;gap:8px 16px}
+.match+.match{padding-top:14px;border-top:1px solid var(--line)}
+.match .err{grid-column:1/-1}
+.match small{display:block;color:var(--muted)}
+.match b{overflow-wrap:anywhere;color:var(--head)}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+label.btn{position:relative;cursor:pointer}
+label.btn:focus-within,.drop:focus-within{outline:2px solid var(--blue);outline-offset:2px}
+.drop{position:relative;display:grid;justify-items:center;gap:4px;padding:22px 16px;border:1.5px dashed var(--line-2);border-radius:8px;background:var(--band);color:var(--label);text-align:center;cursor:pointer}
+.drop b{color:var(--head);font-weight:600}
+.drop .ic{color:var(--blue)}
+.drop:hover,.drop.over{border-color:var(--blue);background:var(--current)}
+.copy-cell{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px}
+.thumb{display:inline-block;padding:0;border:1px solid var(--line-2);border-radius:4px;background:#fff;line-height:0;cursor:zoom-in}
+.thumb img{width:56px;height:42px;object-fit:cover;border-radius:3px}
+.row-btns{display:inline-flex;flex-wrap:wrap;gap:6px}
+.preview{display:grid;gap:12px;justify-items:start}
+.preview img{display:block;max-width:min(100%,640px);height:auto;border:1px solid var(--line);border-radius:6px}
+.fld{display:grid;gap:4px;min-width:0}
+
+/* Guide */
+#guide{position:fixed;z-index:25;left:var(--side-w);right:0;bottom:0}
+#g-card{background:#fff;border-top:1px solid var(--line-2);box-shadow:0 -2px 10px rgba(33,38,60,.06)}
+.g-bar{height:2px;margin-top:-1px;background:var(--line)}
+.g-bar i{display:block;height:100%;background:var(--blue)}
+.g-in{display:flex;align-items:center;justify-content:space-between;gap:8px 24px;padding:9px var(--gr) calc(9px + env(safe-area-inset-bottom,0px)) var(--gl)}
+.g-copy{flex:1 1 auto;min-width:0}
+.g-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 10px}
+#g-title{font-size:13px}
+.g-meta{font-size:12px;color:var(--muted)}
+#g-text{color:var(--label)}
+.g-actions{flex:none;display:flex;align-items:center;gap:4px}
+.g-link{height:33px;padding:0 8px;border:0;background:none;color:var(--link);cursor:pointer}
+.g-link:hover{text-decoration:underline}
+#g-go{min-width:172px;margin-left:6px}
+#guide.min{left:auto;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.g-show{height:33px;padding:0 12px;border:1px solid var(--line-2);border-radius:5px;background:#fff;color:var(--fg);font-weight:500;box-shadow:0 2px 10px rgba(33,38,60,.12);cursor:pointer}
+#toast{position:fixed;z-index:30;bottom:calc(var(--guide-h) + 12px);left:calc(50% + var(--side-w)/2);transform:translateX(-50%);width:max-content;max-width:min(560px,calc(100vw - var(--side-w) - 32px));display:flex;align-items:flex-start;gap:8px;padding:9px 14px;background:#fff;border:1px solid var(--line-2);border-radius:6px;box-shadow:0 4px 16px rgba(33,38,60,.12);color:var(--fg)}
+#toast svg{color:var(--green);margin-top:2px}
+#guide.min~#toast{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+@keyframes flash{from{background-color:#dfeafd;box-shadow:0 0 0 3px #dfeafd}}
+.flash{animation:flash 1.6s ease-out}
+[data-key]{scroll-margin-block:calc(var(--top-h) + var(--tabs-h) + 16px) calc(var(--guide-h) + 16px)}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;outline:2px solid var(--blue);outline-offset:2px}}
+
+/* Middle widths */
+@media (max-width:1100px){
+  .split{display:block}
+  .split-list{display:none}
+  .home-grid{grid-template-columns:minmax(0,1fr)}
+  .org{display:none}
+}
+/* Phone */
+@media (max-width:860px){
+  :root{--gl:max(16px,env(safe-area-inset-left,0px));--gr:max(16px,env(safe-area-inset-right,0px));--tabs-h:44px}
+  body{font-size:14px}
+  .app{display:block;min-height:0}
+  .top{justify-content:space-between}
+  .brand{flex:none}
+  .top-right{margin:0;padding:0}
+  .search,.plus,.side-note{display:none}
+  .side{top:calc(env(safe-area-inset-top,0px) + var(--top-h));z-index:15;height:auto;padding:0;background:#fff;border-right:0;border-bottom:1px solid var(--line)}
+  #nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:0}
+  #nav a{justify-content:center;gap:4px;height:44px;padding:0 2px;border-radius:0}
+  #nav a .ic,.nl{display:none}
+  .ns{display:inline}
+  #nav a[aria-current="page"]{background:none;color:var(--link);box-shadow:inset 0 -2px 0 var(--link)}
+  #nav a[aria-current="page"] .count{background:#fdece0;color:#9a3412}
+  #nav .count{margin-left:0;min-width:16px;height:16px;padding:0 4px;font-size:10.5px}
+  .head{min-height:0;padding-block:12px}
+  input,select{height:44px;font-size:16px}
+  .mini-select{height:44px;font-size:16px}
+  .title-select{min-height:44px}
+  .btn,.btn.sm,.bar-btn,.g-link,.link,.close{min-height:44px}
+  .close{width:44px}
+  .head-right{width:100%;justify-content:space-between}
+  .row{grid-template-columns:minmax(0,1fr)}
+  .match{grid-template-columns:minmax(0,1fr)}
+  .bar-btn{flex:1 1 auto;justify-content:center;height:44px}
+  .actionbar{padding-inline:var(--gl) var(--gr)}
+  .item-table td{padding:3px 0}
+  .item-table td{gap:8px}
+  .item-table td::before{flex:0 0 88px;max-width:none}
+  .item-table td input{flex:1;min-width:0;width:auto}
+  .doc-title{text-align:left}
+  .doc-meta{justify-content:start}
+  .doc-meta dt{text-align:left}
+  .rep-head h2{font-size:16px}
+  #guide{left:0}
+  #toast{left:50%;max-width:calc(100vw - 32px)}
+  .g-in{display:grid;gap:6px;padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+  .g-actions{gap:2px}
+  #g-go{flex:1;min-width:0;margin-left:4px}
+  .g-show{min-height:44px}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <a class="back-exec" href="executive.html" aria-label="Back to the executive dashboard"><svg viewBox="0 0 8 14" width="7" height="12" aria-hidden="true"><path d="M7 1L1 7l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Executive</span></a>
+    <a class="brand" href="#overview"><span id="logo" style="display:flex"></span><span class="brand-name">TrackBill<small>Sample data</small></span></a>
+    <label class="search"><span class="sr">Search purchase orders</span><span id="search-ic" style="display:flex"></span><input id="top-q" type="search" placeholder="Search in Purchase Orders ( / )" autocomplete="off"></label>
+    <div class="top-right">
+      <p class="money"><span>Not billed yet</span> <b id="live-total"></b></p>
+      <p class="org">Sample Supplier Pvt Ltd</p>
+      <a class="plus" id="top-plus" href="#new-po" aria-label="New purchase order"></a>
+    </div>
+  </header>
+  <aside class="side">
+    <nav id="nav" aria-label="Main"></nav>
+    <p class="side-note">Every name and figure here is an example.</p>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+</div>
+<section id="guide" aria-label="Demo guide">
+  <div id="g-card">
+    <div class="g-bar"><i id="g-bar"></i></div>
+    <div class="g-in">
+      <div class="g-copy">
+        <div class="g-top"><h2 id="g-title"></h2><span class="g-meta"><span id="g-step"></span> · <span id="g-who"></span></span></div>
+        <p id="g-text"></p>
+      </div>
+      <div class="g-actions">
+        <button class="g-link" id="g-restart" type="button" data-act="guide-restart">Restart</button>
+        <button class="g-link" type="button" data-act="guide-hide">Hide</button>
+        <button class="btn primary" id="g-go" type="button" data-act="guide-next"></button>
+      </div>
+    </div>
+  </div>
+  <button class="g-show" id="g-show" type="button" data-act="guide-show" hidden>Show demo guide</button>
+</section>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+/* ---------- helpers ---------- */
+const inr = new Intl.NumberFormat('en-IN');
+const rs = n => '₹' + inr.format(Math.round(n));
+const num = n => inr.format(n);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TODAY = (() => { const d = new Date(); d.setHours(12, 0, 0, 0); return d; })();
+const daysAgo = n => { const d = new Date(TODAY); d.setDate(d.getDate() - n); return d; };
+const daysSince = d => Math.round((TODAY - d) / 864e5);
+const dstr = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+// Every PO address starts with po-, so a typed PO number can never land on a screen or a reserved address.
+const slug = s => { const t = String(s).toLowerCase().replace(/[^a-z0-9-]+/g, '-'); return t.startsWith('po-') ? t : 'po-' + t; };
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const ICONS = {
+  overview: '<path d="M4 11.5 12 4.5l8 7M6.5 9.5V20h11V9.5"/>',
+  pos: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9.5 13h6M9.5 17h6"/>',
+  tally: '<path d="M20 11a8 8 0 0 0-14.5-3.5L4 9M4 4v5h5M4 13a8 8 0 0 0 14.5 3.5L20 15M20 20v-5h-5"/>',
+  schedule: '<path d="M5 20v-9M12 20V4M19 20v-6"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
+  truck: '<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  alert: '<path d="M12 4l9 16H3zM12 10v4M12 17v.5"/>',
+  signed: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 14.5l2.2 2.2 4.3-4.6"/>',
+  upload: '<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',
+};
+const icon = (n, s = 16) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+
+/* ---------- sample data ---------- */
+const CONSIGNOR = { name: 'Sample Supplier Pvt Ltd', place: 'Andheri East, Mumbai, Maharashtra', gstin: '27AAAAA0000A1Z5' };
+const CUSTOMERS = {
+  'ABC Telecom Pvt Ltd': { place: 'Thane, Maharashtra', gstin: '27AAAAA0000A2Z4' },
+  'XYZ Networks Ltd': { place: 'Ahmedabad, Gujarat', gstin: '24AAAAA0000A1Z5' },
+  'PQR Infratel Pvt Ltd': { place: 'Pune, Maharashtra', gstin: '27AAAAA0000A3Z3' },
+  'LMN Fibre Projects': { place: 'Bengaluru, Karnataka', gstin: '29AAAAA0000A1Z5' },
+  'DEF Towers Pvt Ltd': { place: 'Nagpur, Maharashtra', gstin: '27AAAAA0000A4Z2' },
+  'RST Networks Pvt Ltd': { place: 'Chennai, Tamil Nadu', gstin: '33AAAAA0000A1Z5' },
+};
+const TERMS = {
+  '75': { first: 75, accept: true, label: '75% on delivery, 25% on acceptance' },
+  '90': { first: 90, accept: true, label: '90% on delivery, 10% on acceptance' },
+  '100': { first: 100, accept: false, label: '100% on delivery' },
+};
+const STATUS = {
+  awaiting: ['Awaiting delivery', 's-awaiting'], invoice: ['Invoice due', 's-invoice'], acceptance: ['Acceptance pending', 's-acceptance'],
+  ready: ['Ready to bill', 's-ready'], part: ['Part delivered', 's-part'], done: ['Fully billed', 's-done'], ahead: ['Billed ahead of delivery', 's-ahead'],
+};
+function seed() {
+  const po = (id, customer, item, hsn, unit, rate, qty, terms, age, acceptedAge) => ({ id, customer, item, hsn, unit, rate, qty, terms, receivedOn: daysAgo(age), acceptedOn: acceptedAge == null ? null : daysAgo(acceptedAge) });
+  const dc = (challan, po, age, qty, signedAge) => ({ challan, po, date: daysAgo(age), qty, vehicle: 'MH 04 XX 1234', ewb: '1234 5678 9012', signed: signedAge != null, signedOn: signedAge == null ? null : daysAgo(signedAge) });
+  const inv = (no, customer, poRef, amount, age, matched = true) => ({ no: 'INV/26-27/' + no, customer, poRef, amount, date: daysAgo(age), po: matched ? poRef : null, how: matched ? 'auto' : null });
+  return {
+    seq: 1, nextChallan: 1064, nextInvoice: 343, tallyQueue: [], lastSync: new Date(Date.now() - 12 * 60000),
+    stock: 5000000, debtors: 12500000,
+    pos: [
+      po('PO-2026-0398', 'XYZ Networks Ltd', 'Optical fibre cable, 48 core', '8544', 'm', 40, 100000, '75', 52),
+      po('PO-2026-0422', 'DEF Towers Pvt Ltd', 'Battery bank, 48 V', '8507', 'sets', 15000, 200, '100', 70),
+      po('PO-2026-0451', 'ABC Telecom Pvt Ltd', 'Optical fibre cable, 24 core', '8544', 'm', 25, 240000, '75', 41),
+      po('PO-2026-0467', 'PQR Infratel Pvt Ltd', 'Tower mounting hardware', '7308', 'sets', 6000, 2000, '90', 33, 3),
+      po('PO-2026-0480', 'LMN Fibre Projects', 'Fibre patch cord, 3 m', '8544', 'pcs', 250, 34000, '75', 20),
+      po('PO-2026-0489', 'ABC Telecom Pvt Ltd', 'Battery bank, 24 V', '8507', 'sets', 12500, 400, '75', 6),
+    ],
+    deliveries: [
+      dc('DC-1027', 'PO-2026-0398', 38, 100000, 35),
+      dc('DC-1011', 'PO-2026-0422', 60, 200, 58),
+      dc('DC-1041', 'PO-2026-0451', 24, 240000, 22),
+      dc('DC-1052', 'PO-2026-0467', 18, 1200, 16),
+      dc('DC-1058', 'PO-2026-0467', 9, 800, 7),
+      dc('DC-1063', 'PO-2026-0480', 5, 20000),
+    ],
+    invoices: [
+      inv('0281', 'DEF Towers Pvt Ltd', 'PO-2026-0422', 3000000, 60),
+      inv('0291', 'XYZ Networks Ltd', 'PO-2026-0398', 3000000, 38),
+      inv('0318', 'ABC Telecom Pvt Ltd', 'PO-2026-0451', 4500000, 24),
+      inv('0327', 'PQR Infratel Pvt Ltd', 'PO-2026-0467', 7200000, 18),
+      inv('0336', 'PQR Infratel Pvt Ltd', 'PO-2026-0467', 3600000, 9),
+      inv('0342', 'LMN Fibre Projects', '', 3750000, 5, false),
+    ],
+  };
+}
+let state = seed();
+const ui = { route: 'overview', minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [] };
+const guide = { i: 0, hidden: false };
+
+/* ---------- the money logic ---------- */
+const poById = id => state.pos.find(p => p.id === id);
+function fig(po) {
+  const ds = state.deliveries.filter(d => d.po === po.id).sort((a, b) => a.date - b.date);
+  const inv = state.invoices.filter(i => i.po === po.id);
+  const value = Math.round(po.rate * po.qty);
+  const qtyDelivered = ds.reduce((s, d) => s + d.qty, 0);
+  const delivered = Math.round(qtyDelivered * po.rate);
+  const billed = Math.round(inv.reduce((s, i) => s + i.amount, 0));
+  const notBilled = Math.max(0, delivered - billed);
+  // Invoices cover the oldest delivery first. Age comes from the oldest delivery still open.
+  // Only open value on a signed challan counts towards drawing power: a signed challan is the only proof.
+  let left = billed, age = null, counts = 0;
+  const opens = {};
+  for (const d of ds) {
+    const v = d.qty * po.rate, covered = Math.min(left, v), open = v - covered;
+    left -= covered;
+    opens[d.challan] = open < 0.5 ? 0 : Math.round(open);
+    if (open < 0.5) continue;
+    if (age === null) age = daysSince(d.date);
+    if (d.signed) counts += open;
+  }
+  const T = TERMS[po.terms];
+  let status;
+  if (billed > delivered) status = 'ahead';
+  else if (!ds.length) status = 'awaiting';
+  else if (notBilled === 0) status = delivered >= value ? 'done' : 'part';
+  else if (billed < T.first / 100 * delivered) status = 'invoice';
+  else if (T.accept && !po.acceptedOn) status = 'acceptance';
+  else status = 'ready';
+  return { ds, inv, value, qtyDelivered, delivered, billed, notBilled, age: age || 0, counts: Math.min(notBilled, Math.round(counts)), opens, status, pct: delivered ? Math.round(billed / delivered * 100) : 0, signed: ds.filter(d => d.signed).length };
+}
+const allFigs = () => state.pos.map(p => ({ p, f: fig(p) }));
+function totals() {
+  const a = allFigs();
+  return { value: a.reduce((s, x) => s + x.f.value, 0), delivered: a.reduce((s, x) => s + x.f.delivered, 0), billed: a.reduce((s, x) => s + x.f.billed, 0), notBilled: a.reduce((s, x) => s + x.f.notBilled, 0), open: a.filter(x => x.f.notBilled > 0).length };
+}
+const unmatched = () => state.invoices.filter(i => !i.po);
+
+/* ---------- signed copies ---------- */
+// `copy` is the uploaded file. `signed` means accounts approved it, and only then does the challan count.
+const byDC = id => state.deliveries.find(d => d.challan === id);
+const copyState = d => d.signed ? 'approved' : d.copy ? 'waiting' : 'missing';
+const openByDC = () => Object.assign({}, ...allFigs().map(x => x.f.opens));
+const countsTotal = () => allFigs().reduce((s, x) => s + x.f.counts, 0);
+const dcFromName = name => { const m = /DC[\s_-]*0*(\d+)/i.exec(name); return m ? 'DC-' + m[1] : null; };
+const readFile = file => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+// A drawn stand-in for a scanned copy, so the demo works without a file at hand.
+function sampleSrc(d) {
+  const po = poById(d.po);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="340" viewBox="0 0 480 340" font-family="Arial, Helvetica, sans-serif"><rect width="480" height="340" fill="#fbfaf5"/><rect x=".5" y=".5" width="479" height="339" fill="none" stroke="#d9d6cc"/><text x="28" y="44" font-size="20" font-weight="700" fill="#222">Delivery Challan</text><text x="28" y="68" font-size="13" fill="#555"># ${d.challan}, ${dstr(d.date)}</text><text x="28" y="92" font-size="13" fill="#555">To: ${esc(po.customer)}</text><text x="28" y="112" font-size="13" fill="#555">PO: ${esc(po.id)}</text><rect x="28" y="130" width="424" height="1" fill="#ccc"/><text x="28" y="156" font-size="13" fill="#333">${esc(po.item)}</text><text x="452" y="156" font-size="13" fill="#333" text-anchor="end">${num(d.qty)} ${esc(po.unit)}</text><rect x="28" y="172" width="424" height="1" fill="#ccc"/><path d="M40 276c14-22 26-24 30-10s-6 22 6 8 18-20 24-6 4 14 16 2 20-12 34-4" fill="none" stroke="#1d3f94" stroke-width="2.4" stroke-linecap="round"/><text x="28" y="304" font-size="12" fill="#777">Received by, with stamp and date</text><g transform="rotate(-8 365 250)"><rect x="290" y="214" width="150" height="70" rx="6" fill="none" stroke="#b3261e" stroke-width="2.5"/><text x="365" y="244" font-size="16" font-weight="700" fill="#b3261e" text-anchor="middle">RECEIVED</text><text x="365" y="268" font-size="12" fill="#b3261e" text-anchor="middle">${dstr(d.date)}</text></g><text x="452" y="326" font-size="11" fill="#999" text-anchor="end">Sample copy</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+const copySrc = d => d.copy ? d.copy.src : d.signed ? sampleSrc(d) : null;
+// ponytail: copies stay in this browser tab as data URLs, so a reload clears them. The real product stores the files.
+async function attachFiles(files, dc) {
+  let added = 0, approved = 0, loose = 0, other = 0;
+  for (const file of files) {
+    const isImg = /^image\//.test(file.type), isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    if (!isImg && !isPdf) { other++; continue; }
+    const src = isImg ? await readFile(file) : null;
+    const d = byDC(dc || dcFromName(file.name));
+    if (!d) { ui.loose.push({ name: file.name, src }); loose++; continue; }
+    if (d.signed) { approved++; continue; }
+    d.copy = { name: file.name, src, on: TODAY, seq: state.seq++ }; added++;
+  }
+  render();
+  toast([
+    added && `${added} signed ${added === 1 ? 'copy' : 'copies'} added, waiting for approval.`,
+    loose && `${plural(loose, 'file')} had no DC number we know.`,
+    approved && `${plural(approved, 'challan')} already approved, so skipped.`,
+    other && `${plural(other, 'file')} skipped: only photos and PDFs.`,
+  ].filter(Boolean).join(' ') || 'No file added.');
+}
+
+/* ---------- actions on the data ---------- */
+function addPO(o) {
+  const id = (o.id || '').trim(), customer = (o.customer || '').trim();
+  if (!id) return 'Enter the PO number.';
+  if (state.pos.some(p => slug(p.id) === slug(id))) return `${id} is already in the register.`;
+  if (!customer) return 'Enter the customer name.';
+  if (!(o.rate > 0) || !(o.qty > 0)) return 'Rate and quantity must be more than zero.';
+  state.pos.push({ id, customer, item: (o.item || '').trim() || 'Material', hsn: (o.hsn || '').trim(), unit: (o.unit || '').trim() || 'unit', rate: o.rate, qty: o.qty, terms: TERMS[o.terms] ? o.terms : '75', receivedOn: TODAY, acceptedOn: null, seq: state.seq++ });
+  return null;
+}
+function logDelivery(po, qty, vehicle, ewb) {
+  const left = po.qty - fig(po).qtyDelivered;
+  if (!(qty > 0)) return 'Enter a quantity above zero.';
+  if (qty > left) return `Only ${num(left)} ${po.unit} left to deliver on this PO.`;
+  const challan = 'DC-' + state.nextChallan++;
+  state.deliveries.push({ challan, po: po.id, date: TODAY, qty, vehicle: (vehicle || '').trim(), ewb: (ewb || '').trim(), signed: false, signedOn: null, seq: state.seq++ });
+  ui.challan = challan;
+  return null;
+}
+function createInvoice(customer, poRef, amount) {
+  if (!(amount > 0)) return 'Enter an amount above zero.';
+  state.tallyQueue.push({ no: 'INV/26-27/0' + state.nextInvoice++, customer, poRef: (poRef || '').trim(), amount, date: TODAY, po: null, how: null, seq: state.seq++ });
+  return null;
+}
+function sync() {
+  const q = state.tallyQueue.splice(0);
+  let auto = 0, review = 0;
+  for (const i of q) {
+    const p = state.pos.find(x => i.poRef && x.id.toLowerCase() === i.poRef.toLowerCase() && x.customer === i.customer);
+    state.invoices.push({ ...i, po: p ? p.id : null, how: p ? 'auto' : null });
+    state.debtors += Math.round(i.amount * 1.18);
+    if (p) auto++; else review++;
+  }
+  state.lastSync = new Date();
+  return { auto, review, n: q.length };
+}
+function matchInvoice(no, poId) {
+  const i = state.invoices.find(x => x.no === no);
+  if (!i || i.po) return;
+  i.po = poId; i.how = 'manual'; i.seq = state.seq++;
+}
+
+/* ---------- small view pieces ---------- */
+const statusTag = s => `<span class="st ${STATUS[s][1]}">${STATUS[s][0]}</span>`;
+const ageClass = a => a > 30 ? 'age-late' : a > 15 ? 'age-warn' : '';
+const poHref = id => '#' + slug(id);
+const newestFirst = (a, b) => b.p.receivedOn - a.p.receivedOn || (b.p.seq || 0) - (a.p.seq || 0);
+const matchedHow = i => i.how === 'manual' ? 'Matched by hand' : 'Matched automatically';
+const thumb = d => copySrc(d) ? `<button class="thumb" type="button" data-act="preview" data-v="${esc(d.challan)}" aria-label="View signed copy of ${esc(d.challan)}"><img data-copy="${esc(d.challan)}" alt=""></button>` : d.copy ? `<button class="link" type="button" data-act="preview" data-v="${esc(d.challan)}">PDF</button>` : '';
+function copyActions(d, add = 'Upload') {
+  const v = esc(d.challan);
+  return {
+    approved: '<span class="st s-done">Approved</span>',
+    waiting: `<span class="st s-ready">Waiting for approval</span><span class="row-btns"><button class="btn primary sm" type="button" data-act="approve" data-v="${v}">Approve</button><button class="btn sm" type="button" data-act="reject-copy" data-v="${v}">Reject</button></span>`,
+    missing: `<label class="btn sm">${icon('upload', 14)} ${add}<input class="vh" type="file" accept="image/*,application/pdf" data-dc="${v}"></label>`,
+  }[copyState(d)];
+}
+function reviewBanner() {
+  const u = unmatched();
+  if (!u.length) return '';
+  const names = [...new Set(u.map(i => i.customer))].map(esc).join(', ');
+  return `<p class="banner" data-key="review">${icon('alert')}<span>${plural(u.length, 'invoice')} from Tally ${u.length === 1 ? 'has' : 'have'} no matching PO yet, so ${names} may look higher than it is. <a href="#tally">Review it</a></span></p>`;
+}
+function nextStep(po, f) {
+  const log = '<button class="btn primary sm" type="button" data-act="toggle-log">Log Delivery</button>';
+  const accept = '<button class="btn primary sm" type="button" data-act="accept">Record Acceptance</button>';
+  const tally = '<a class="btn primary sm" href="#tally">Open Tally Invoices</a>';
+  return {
+    awaiting: ['Log the delivery when material leaves your store.', log],
+    invoice: [`No invoice found yet for ${rs(f.notBilled)} delivered. Ask accounts to bill it in Tally.`, tally],
+    acceptance: [`${rs(f.notBilled)} is waiting for ${esc(po.customer)} to accept the material.`, accept],
+    ready: [`${rs(f.notBilled)} can be billed now. Ask accounts to raise the invoice in Tally.`, tally],
+    part: ['Everything delivered so far is billed. More material is still to go.', log],
+    done: ['Delivered and billed in full.', ''],
+    ahead: [`Invoices are ${rs(f.billed - f.delivered)} ahead of delivery. Check the PO match or log the delivery.`, ''],
+  }[f.status];
+}
+
+/* ---------- screens ---------- */
+function viewOverview() {
+  const t = totals();
+  const open = allFigs().filter(x => x.f.notBilled > 0).sort((a, b) => b.f.age - a.f.age);
+  const buckets = [[0, 7, '0 to 7 days'], [8, 15, '8 to 15 days'], [16, 30, '16 to 30 days'], [31, 1e9, 'Over 30 days']].map(([a, b, label], i) => ({ i, label, sum: open.filter(x => x.f.age >= a && x.f.age <= b).reduce((s, x) => s + x.f.notBilled, 0) }));
+  const share = b => t.notBilled ? Math.round(b.sum / t.notBilled * 100) : 0;
+  const list = open.filter(x => !ui.minAge || x.f.age > ui.minAge);
+  const over15 = open.filter(x => x.f.age > 15);
+  const billedPct = t.delivered ? Math.round(t.billed / t.delivered * 100) : 0;
+  const ageOpts = [[0, 'All ages'], [7, 'Over 7 days'], [15, 'Over 15 days'], [30, 'Over 30 days']].map(([v, l]) => `<option value="${v}" ${ui.minAge === v ? 'selected' : ''}>${l}</option>`).join('');
+  return `
+  <header class="head"><div><h1>Dashboard</h1><p class="muted">${esc(CONSIGNOR.name)}</p></div></header>
+  <div class="pad stack narrow">
+    ${reviewBanner()}
+    <section class="card">
+      <div class="card-head"><h2>Delivered, Not Billed</h2><a class="plain" href="#new-po">+ New PO</a></div>
+      <div class="card-body">
+        <div>
+          <p class="cap">Total not billed, across ${plural(t.open, 'PO')}</p>
+          <p class="big" id="total-notbilled">${rs(t.notBilled)}</p>
+          <p class="muted">Material that has left your store with no invoice yet. All amounts before GST.</p>
+        </div>
+        <div class="seg" role="img" aria-label="Not billed by age: ${buckets.map(b => `${b.label} ${rs(b.sum)}`).join(', ')}">${buckets.filter(b => b.sum > 0).map(b => `<i class="a${b.i}" style="flex:${b.sum} 1 0" title="${b.label}: ${rs(b.sum)}, ${share(b)}%"></i>`).join('')}</div>
+        <ul class="legend">${buckets.map(b => `<li><i class="a${b.i}"></i>${b.label} : <b>${rs(b.sum)}</b></li>`).join('')}</ul>
+        <p class="muted">${over15.length ? `${plural(over15.length, 'PO')}, ${rs(over15.reduce((s, x) => s + x.f.notBilled, 0))}, ${over15.length === 1 ? 'has' : 'have'} been unbilled for over 15 days.` : 'Nothing has been unbilled for over 15 days.'}</p>
+      </div>
+      <div class="figs card-foot">
+        <div class="fig"><span>Delivered</span><b>${rs(t.delivered)}</b></div>
+        <div class="fig"><span>Billed</span><b>${rs(t.billed)}</b></div>
+        <div class="fig"><span>Billed so far</span><b>${billedPct}%</b></div>
+      </div>
+    </section>
+    <div class="home-grid">
+      <section class="card">
+        <div class="card-head"><h2>Needs Action, Oldest First</h2><span><label class="sr" for="age-filter">Filter by age</label><select class="mini-select" id="age-filter">${ageOpts}</select></span></div>
+        ${list.length ? `<div class="table-wrap"><table class="rtable"><thead><tr><th class="l">PO</th><th class="l">Status</th><th>Age</th><th>Not billed</th></tr></thead><tbody>
+        ${list.map(({ p, f }) => `<tr data-go="${slug(p.id)}"><td class="lead l" data-label="PO"><a class="plain" href="${poHref(p.id)}">${esc(p.id)}</a><small>${esc(p.customer)}</small></td><td class="l" data-label="Status">${statusTag(f.status)}</td><td class="nowrap" data-label="Age"><span class="${ageClass(f.age)}">${f.age} days</span></td><td data-label="Not billed"><b>${rs(f.notBilled)}</b></td></tr>`).join('')}
+        </tbody></table></div>` : '<p class="muted" style="padding:16px">Nothing that old right now.</p>'}
+      </section>
+      <section class="card" id="reminders">
+        <div class="card-head"><h2>Reminders</h2></div>
+        <div class="card-body">
+          <p class="muted">At thresholds you set.</p>
+          ${[[7, 'the Account Manager'], [15, 'the accounts team'], [30, 'the owner']].map(([d, who]) => `<div class="kv"><span>Over ${d} days, to ${who}</span><b>${plural(open.filter(x => x.f.age > d).length, 'PO')}</b></div>`).join('')}
+          <p class="muted">Sent automatically in the full product.</p>
+        </div>
+      </section>
+    </div>
+  </div>`;
+}
+function poRows() {
+  const q = ui.q.trim().toLowerCase();
+  const rows = allFigs().filter(({ p, f }) => (!q || p.id.toLowerCase().includes(q) || p.customer.toLowerCase().includes(q)) && (!ui.st || f.status === ui.st)).sort(newestFirst);
+  if (!rows.length) return '<tr><td class="lead l" colspan="8">No PO matches this search.</td></tr>';
+  return rows.map(({ p, f }) => `<tr data-go="${slug(p.id)}">
+    <td class="l nowrap" data-label="PO date">${dstr(p.receivedOn)}</td>
+    <td class="lead l nowrap" data-label="PO"><a class="plain" href="${poHref(p.id)}">${esc(p.id)}</a></td>
+    <td class="l" data-label="Customer">${esc(p.customer)}</td>
+    <td class="l" data-label="Status">${statusTag(f.status)}</td>
+    <td data-label="PO value">${rs(f.value)}</td><td data-label="Delivered">${rs(f.delivered)}</td><td data-label="Billed">${rs(f.billed)}</td>
+    <td data-label="Not billed"><b>${rs(f.notBilled)}</b></td></tr>`).join('');
+}
+function viewPOs() {
+  const t = totals();
+  const opts = Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${ui.st === k ? 'selected' : ''}>${v[0]}</option>`).join('');
+  return `
+  <header class="head">
+    <h1><label class="sr" for="po-status">Show purchase orders</label><select class="title-select" id="po-status"><option value="">All Purchase Orders</option>${opts}</select></h1>
+    <button class="btn primary" type="button" data-act="toggle-add">${icon('plus', 14)} New</button>
+  </header>
+  <div class="pad">
+    <section class="card summary">
+      <h2 class="cap-up">PO Summary</h2>
+      <div class="figs">
+        <div class="fig"><span>PO value</span><b>${rs(t.value)}</b></div>
+        <div class="fig"><span>Delivered</span><b>${rs(t.delivered)}</b></div>
+        <div class="fig"><span>Billed</span><b>${rs(t.billed)}</b></div>
+        <div class="fig"><span>Not billed</span><b>${rs(t.notBilled)}</b></div>
+      </div>
+    </section>
+  </div>
+  <div class="table-wrap" style="margin-top:20px"><table class="rtable edge">
+    <thead><tr><th class="l">Date</th><th class="l">PO#</th><th class="l">Customer name</th><th class="l">Status</th><th>PO value</th><th>Delivered</th><th>Billed</th><th>Not billed</th></tr></thead>
+    <tbody id="po-rows">${poRows()}</tbody></table></div>`;
+}
+function nextPoNumber() { let n = 512; while (poById('PO-2026-0' + n)) n++; return 'PO-2026-0' + n; }
+function formAddPO() {
+  const custs = Object.keys(CUSTOMERS).map(c => `<option value="${esc(c)}"></option>`).join('');
+  return `
+  <header class="head"><h1>New Purchase Order</h1><button class="close" style="border:0;background:none;cursor:pointer" type="button" data-act="toggle-add" aria-label="Close">${icon('close')}</button></header>
+  <form class="pad stack form-page" data-form="add-po">
+    <p class="muted">Filled with sample values so you can save it in one click.</p>
+    <div class="row"><label class="req" for="f-cust">Customer Name*</label><div><input id="f-cust" name="customer" list="cust-list" value="RST Networks Pvt Ltd"><datalist id="cust-list">${custs}</datalist></div></div>
+    <div class="row"><label class="req" for="f-id">PO Number*</label><input id="f-id" name="id" value="${esc(nextPoNumber())}"></div>
+    <div class="row"><label for="f-terms">Billing Terms</label><select id="f-terms" name="terms">${Object.entries(TERMS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('')}</select></div>
+    <div class="sec">
+      <div class="table-wrap"><table class="rtable item-table">
+        <thead><tr><th class="l">Item details</th><th class="l">HSN</th><th>Quantity</th><th class="l">Unit</th><th>Rate (₹)</th><th>Amount</th></tr></thead>
+        <tbody><tr>
+          <td class="l" data-label="Item details"><input id="f-item" name="item" aria-label="Item details" value="Optical fibre cable, 24 core"></td>
+          <td class="l" data-label="HSN"><input id="f-hsn" name="hsn" aria-label="HSN code" value="8544"></td>
+          <td data-label="Quantity"><input class="num" id="f-qty" name="qty" type="number" min="0" step="any" aria-label="Quantity" value="320000"></td>
+          <td class="l" data-label="Unit"><input id="f-unit" name="unit" aria-label="Unit" value="m"></td>
+          <td data-label="Rate (₹)"><input class="num" id="f-rate" name="rate" type="number" min="0" step="any" aria-label="Rate in rupees" value="25"></td>
+          <td data-label="Amount" style="vertical-align:middle" id="f-amt">₹80,00,000</td>
+        </tr></tbody></table></div>
+      <p class="form-total"><span>Total (₹)</span><b id="f-total">₹80,00,000</b></p>
+    </div>
+    <div class="form-foot"><button class="btn primary" type="submit">Save</button><button class="btn" type="button" data-act="toggle-add">Cancel</button><span class="err" role="alert"></span></div>
+  </form>`;
+}
+function challanDoc(d, po) {
+  const c = CUSTOMERS[po.customer] || { place: '', gstin: '' };
+  const value = d.qty * po.rate, gst = Math.round(value * .18);
+  const interstate = c.place && !c.place.endsWith('Maharashtra');
+  const taxLabel = interstate ? 'IGST at 18%' : 'CGST 9% and SGST 9%';
+  return `<article class="paper ribboned" data-key="challan" id="challan-doc">
+    <span class="ribbon">Sample</span>
+    <div class="doc-top">
+      <div class="doc-from"><b>${esc(CONSIGNOR.name)}</b>${esc(CONSIGNOR.place)}<br>GSTIN ${esc(CONSIGNOR.gstin)}</div>
+      <div class="doc-title"><h2>Delivery Challan</h2><p class="muted"># ${esc(d.challan)}</p></div>
+    </div>
+    <div class="doc-mid">
+      <div class="doc-to"><span class="label">Deliver To</span><b>${esc(po.customer)}</b>${esc(c.place)}${c.gstin ? `<br>GSTIN ${esc(c.gstin)}` : ''}</div>
+      <dl class="doc-meta">
+        <dt>Challan Date :</dt><dd>${dstr(d.date)}</dd>
+        <dt>PO Number :</dt><dd>${esc(po.id)}</dd>
+        <dt>Vehicle No. :</dt><dd>${esc(d.vehicle) || 'Not entered'}</dd>
+        <dt>E-way Bill :</dt><dd>${esc(d.ewb) || 'Not entered'}</dd>
+        ${interstate ? `<dt>Place of Supply :</dt><dd>${esc(c.place.split(', ').pop())}</dd>` : ''}
+      </dl>
+    </div>
+    <div class="table-wrap"><table class="rtable">
+      <thead><tr><th class="l">Item details</th><th>HSN</th><th>Quantity</th><th>Rate</th><th>Taxable value</th></tr></thead>
+      <tbody><tr><td class="lead l" data-label="Item details"><b>${esc(po.item)}</b></td><td data-label="HSN">${esc(po.hsn) || 'Not entered'}</td><td data-label="Quantity">${num(d.qty)} ${esc(po.unit)}</td><td data-label="Rate">${rs(po.rate)}</td><td data-label="Taxable value">${rs(value)}</td></tr>
+      <tr><td class="blank" colspan="4">${taxLabel}</td><td data-label="${taxLabel}">${rs(gst)}</td></tr>
+      <tr class="tot"><td class="blank" colspan="4">Total</td><td data-label="Total">${rs(value + gst)}</td></tr></tbody></table></div>
+    <div class="sign"><div>For ${esc(CONSIGNOR.name)}</div><div>Received by, with stamp and date</div></div>
+  </article>
+  <p class="doc-note">Your CA confirms which documents travel with the goods. In the full product this challan prints with your letterhead.</p>`;
+}
+function events(po, f) {
+  const ev = [{ d: po.receivedOn, k: po.seq || 0, o: 0, who: 'Account Manager', t: `PO entered for ${rs(f.value)}` }];
+  f.ds.forEach(x => {
+    ev.push({ d: x.date, k: x.seq || 0, o: 1, who: 'Account Manager', t: `${num(x.qty)} ${esc(po.unit)} delivered on challan ${esc(x.challan)}` });
+    if (x.copy) ev.push({ d: x.copy.on, k: x.copy.seq || 0, o: 2, who: 'Site team', t: `Signed copy of ${esc(x.challan)} uploaded` });
+    if (x.signed) ev.push({ d: x.signedOn, k: x.signSeq || 0, o: 2, who: 'Accounts team', t: `Signed copy of ${esc(x.challan)} approved` });
+  });
+  f.inv.forEach(i => ev.push({ d: i.date, k: i.seq || 0, o: 3, who: i.how === 'manual' ? 'Accounts team' : 'Tally sync', t: `Invoice ${esc(i.no)} for ${rs(i.amount)} ${i.how === 'manual' ? 'matched by hand' : 'matched automatically'}` }));
+  if (po.acceptedOn) ev.push({ d: po.acceptedOn, k: po.acceptSeq || 0, o: 4, who: 'Account Manager', t: 'Customer acceptance recorded' });
+  return ev.sort((a, b) => a.d - b.d || a.k - b.k || a.o - b.o);
+}
+function viewPO(po) {
+  const f = fig(po), T = TERMS[po.terms], left = po.qty - f.qtyDelivered;
+  const [msg, nextBtn] = nextStep(po, f);
+  const showing = ui.challan && f.ds.find(d => d.challan === ui.challan);
+  const items = allFigs().sort(newestFirst).map(({ p, f: x }) => `<a class="sl-row" href="${poHref(p.id)}" ${p.id === po.id ? 'aria-current="true"' : ''}>
+      <span class="sl-top"><span class="sl-name">${esc(p.customer)}</span><b>${rs(x.notBilled)}</b></span>
+      <span class="sl-sub">${esc(p.id)} • ${dstr(p.receivedOn)}</span>
+      ${statusTag(x.status)}</a>`).join('');
+  return `<div class="split">
+    <aside class="split-list" aria-label="All purchase orders">
+      <div class="sl-head"><a class="plain" href="#purchase-orders">All Purchase Orders</a><span class="cap-up">Not billed</span></div>
+      ${items}
+    </aside>
+    <div class="split-main">
+      <header class="head">
+        <div><h1>${esc(po.id)}</h1><p class="muted">${esc(po.customer)}. ${T.label}.</p></div>
+        <div class="head-right"><span id="po-status-pill" data-key="status">${statusTag(f.status)}</span><a class="close" href="#purchase-orders" aria-label="Back to all purchase orders">${icon('close')}</a></div>
+      </header>
+      <div class="actionbar">
+        <button class="bar-btn" type="button" data-act="toggle-log" ${left > 0 ? '' : 'disabled'}>${icon('truck', 15)} ${left > 0 ? 'Log Delivery' : 'All Delivered'}</button>
+        ${T.accept ? `<button class="bar-btn" type="button" data-act="accept" ${!f.delivered || po.acceptedOn ? 'disabled' : ''}>${icon('check', 15)} ${po.acceptedOn ? 'Accepted on ' + dstr(po.acceptedOn) : 'Record Acceptance'}</button>` : ''}
+      </div>
+      <div class="pad stack detail">
+        <div class="next" id="po-next"><div><span class="cap-up">What's next?</span><p>${msg}</p></div>${nextBtn}</div>
+        <section class="card figs box-figs" aria-label="PO figures">
+          <div class="fig"><span>PO value</span><b>${rs(f.value)}</b><small>${num(po.qty)} ${esc(po.unit)} of ${esc(po.item)}</small></div>
+          <div class="fig"><span>Delivered</span><b>${rs(f.delivered)}</b><small>${num(f.qtyDelivered)} ${esc(po.unit)}</small></div>
+          <div class="fig"><span>Billed</span><b id="po-billed">${rs(f.billed)}</b><small>${f.delivered ? f.pct + '% of delivered' : 'Nothing delivered yet'}</small></div>
+          <div class="fig ${f.notBilled ? 'hot' : 'calm'}" data-key="notbilled"><span>Not billed</span><b id="po-notbilled">${rs(f.notBilled)}</b><small id="po-age">${f.notBilled ? f.age + ' days old' : 'All clear'}</small></div>
+        </section>
+        ${ui.logging === po.id ? `<form class="card" data-form="log-delivery">
+          <div class="card-head"><h2>Log a Delivery</h2></div>
+          <div class="card-body">
+            <div class="row"><label class="req" for="d-qty">Quantity (${esc(po.unit)})*</label><div><input id="d-qty" name="qty" type="number" min="0" step="any" value="${left}"><small class="muted">${num(left)} left to deliver</small></div></div>
+            <div class="row"><label for="d-veh">Vehicle No.</label><input id="d-veh" name="vehicle" value="MH 04 XX 1234"></div>
+            <div class="row"><label for="d-ewb">E-way Bill No.</label><input id="d-ewb" name="ewb" value="1234 5678 9012"></div>
+            <div class="form-foot"><button class="btn primary" type="submit">Create Challan</button><button class="btn" type="button" data-act="toggle-log">Cancel</button><span class="err" role="alert"></span></div>
+          </div></form>` : ''}
+        ${showing ? challanDoc(showing, po) : ''}
+        <section class="sec"><h2>Deliveries and Challans</h2>
+          ${f.ds.length ? `<div class="table-wrap"><table class="rtable"><thead><tr><th class="l">Challan#</th><th class="l">Date</th><th>Quantity</th><th>Value</th><th>Signed copy</th></tr></thead><tbody>
+          ${f.ds.map(d => `<tr><td class="lead l" data-label="Challan"><button class="link" type="button" data-act="show-challan" data-v="${esc(d.challan)}">${esc(d.challan)}</button></td><td class="l nowrap" data-label="Date">${dstr(d.date)}</td><td data-label="Quantity">${num(d.qty)} ${esc(po.unit)}</td><td data-label="Value">${rs(d.qty * po.rate)}</td>
+            <td data-label="Signed copy"><span class="copy-cell">${thumb(d)}${copyActions(d, 'Add Signed Copy')}</span></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">No delivery logged yet.</p>'}
+        </section>
+        <section class="sec"><h2>Invoices from Tally</h2>
+          ${f.inv.length ? `<div class="table-wrap"><table class="rtable"><thead><tr><th class="l">Invoice#</th><th class="l">Date</th><th class="l">Match</th><th>Amount</th></tr></thead><tbody>
+          ${f.inv.map(i => `<tr><td class="lead l nowrap" data-label="Invoice"><b>${esc(i.no)}</b></td><td class="l nowrap" data-label="Date">${dstr(i.date)}</td><td class="l" data-label="Match">${matchedHow(i)}</td><td data-label="Amount">${rs(i.amount)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">No invoice found in Tally yet.</p>'}
+        </section>
+        <section class="sec"><h2>Activity</h2>
+          <ol class="tl">${events(po, f).map(e => `<li><span class="when">${dstr(e.d)}</span><div class="what">${e.t}<small>${esc(e.who)}</small></div></li>`).join('')}</ol>
+        </section>
+      </div>
+    </div>
+  </div>`;
+}
+function viewTally() {
+  const review = unmatched();
+  const synced = state.invoices.filter(i => i.po).sort((a, b) => b.date - a.date || (b.seq || 0) - (a.seq || 0));
+  const time = state.lastSync.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+  const q = state.tallyQueue.length;
+  const custs = [...new Set([...state.pos.map(p => p.customer)])];
+  return `
+  <header class="head"><div><h1>Tally Invoices</h1><p class="muted">Your accounts team keeps billing in Tally. TrackBill reads each invoice when Tally is open on the accounts computer.</p></div>
+    <button class="btn primary" type="button" data-act="sync">${icon('tally', 14)} Sync Now</button></header>
+  <div class="pad stack narrow">
+    <p class="muted" id="sync-line">Last synced at ${time}.${q ? ` ${plural(q, 'new invoice')} waiting in Tally.` : ''} In this demo the sync is simulated.</p>
+    ${review.length ? `<section class="card review" data-key="review-card">
+      <div class="card-head"><h2>Needs Review: ${plural(review.length, 'invoice')}</h2></div>
+      <div class="card-body">
+        <p class="muted">TrackBill matches an invoice only when the PO number and the customer agree. Otherwise it asks you instead of guessing.</p>
+        ${review.map(i => {
+          const cands = state.pos.filter(p => p.customer === i.customer);
+          const list = cands.length ? cands : state.pos;
+          return `<form class="match" data-form="match" data-inv="${esc(i.no)}">
+            <div><b>${esc(i.no)}</b>, ${rs(i.amount)}<small>${esc(i.customer)}. ${i.poRef ? `PO number ${esc(i.poRef)} is not on this customer's list.` : 'No PO number on the invoice.'}</small></div>
+            <div class="fld"><label for="m-${slug(i.no)}">Belongs to</label><select id="m-${slug(i.no)}" name="po"><option value="">Choose a PO</option>${list.map(p => `<option value="${esc(p.id)}">${esc(p.id)}, ${rs(fig(p).notBilled)} not billed</option>`).join('')}</select></div>
+            <button class="btn primary" type="submit">Match Invoice</button><span class="err" role="alert"></span></form>`;
+        }).join('')}
+      </div></section>` : `<p class="banner good" id="no-review">${icon('check')}<span>Every invoice is matched to a PO.</span></p>`}
+    <section class="sec"><h2>Matched Invoices</h2>
+      <div class="table-wrap"><table class="rtable"><thead><tr><th class="l">Invoice#</th><th class="l">Customer name</th><th class="l">PO#</th><th class="l">Date</th><th>Amount</th></tr></thead><tbody>
+      ${synced.map(i => `<tr data-go="${slug(i.po)}"><td class="lead l" data-label="Invoice"><b>${esc(i.no)}</b><small>${matchedHow(i)}</small></td><td class="l" data-label="Customer">${esc(i.customer)}</td><td class="l nowrap" data-label="PO"><a class="plain" href="${poHref(i.po)}">${esc(i.po)}</a></td><td class="l nowrap" data-label="Date">${dstr(i.date)}</td><td data-label="Amount">${rs(i.amount)}</td></tr>`).join('')}</tbody></table></div>
+    </section>
+    <form class="card" data-form="tally-invoice">
+      <div class="card-head"><h2>Try It: Raise an Invoice in Tally</h2></div>
+      <div class="card-body">
+        <p class="muted">This form stands in for Tally in the demo. Leave the PO number blank to see how a missing number is handled.</p>
+        <div class="row"><label for="t-cust">Customer Name</label><select id="t-cust" name="customer">${custs.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></div>
+        <div class="row"><label for="t-po">PO Number on Invoice</label><input id="t-po" name="poRef" placeholder="PO-2026-0451"></div>
+        <div class="row"><label class="req" for="t-amt">Amount Before GST (₹)*</label><input id="t-amt" name="amount" type="number" min="0" step="any" value="1500000"></div>
+        <div class="form-foot"><button class="btn" type="submit">Raise Invoice</button><span class="err" role="alert"></span></div>
+      </div>
+    </form>
+  </div>`;
+}
+function viewChallans() {
+  const open = openByDC(), ORDER = { waiting: 0, missing: 1, approved: 2 };
+  const rows = state.deliveries.map(d => ({ d, p: poById(d.po), s: copyState(d), open: open[d.challan] || 0 }))
+    .sort((a, b) => ORDER[a.s] - ORDER[b.s] || b.d.date - a.d.date || (b.d.seq || 0) - (a.d.seq || 0));
+  const n = s => rows.filter(r => r.s === s).length, sum = s => rows.filter(r => r.s === s).reduce((t, r) => t + r.open, 0);
+  const pv = ui.preview && byDC(ui.preview);
+  const free = state.deliveries.filter(d => !d.signed);
+  return `
+  <header class="head"><div><h1>Signed Challans</h1><p class="muted">Proof of delivery for every challan. A copy counts on the bank sheet once accounts approves it.</p></div></header>
+  <div class="pad stack">
+    <section class="card figs box-figs" aria-label="Signed copy figures">
+      <div class="fig ${n('missing') ? 'hot' : 'calm'}"><span>Signed copy missing</span><b id="sc-missing">${n('missing')}</b><small>${rs(sum('missing'))} unbilled on them</small></div>
+      <div class="fig"><span>Waiting for approval</span><b id="sc-waiting">${n('waiting')}</b><small>${rs(sum('waiting'))} counts once approved</small></div>
+      <div class="fig"><span>Approved</span><b id="sc-approved">${n('approved')}</b><small>${rs(sum('approved'))} counts for the bank</small></div>
+    </section>
+    <label class="drop" data-key="drop">${icon('upload', 22)}<b>Drop scanned copies here, or choose files</b>
+      <span>Name each file by its DC number, for example DC-1063.pdf, and TrackBill attaches it to that challan. On a phone, you can take a photo instead.</span>
+      <input id="bulk-files" class="vh" type="file" multiple accept="image/*,application/pdf"></label>
+    ${n('missing') ? '<p class="muted">No scan at hand? <button class="link" type="button" data-act="sample-copies">Add a sample copy to each missing challan</button></p>' : ''}
+    ${ui.loose.length ? `<section class="card review" data-key="loose">
+      <div class="card-head"><h2>Not Matched: ${plural(ui.loose.length, 'file')}</h2></div>
+      <div class="card-body">
+        <p class="muted">These file names have no DC number we know. Pick the challan each one belongs to.</p>
+        ${ui.loose.map((f, i) => `<form class="match" data-form="assign-copy" data-i="${i}">
+          <div><b>${esc(f.name)}</b><small>${f.src ? 'Photo' : 'PDF'}</small></div>
+          <div class="fld"><label for="as-${i}">Belongs to</label><select id="as-${i}" name="dc"><option value="">Choose a challan</option>${free.map(d => `<option value="${esc(d.challan)}">${esc(d.challan)}, ${esc(poById(d.po).customer)}</option>`).join('')}</select></div>
+          <span class="row-btns"><button class="btn primary" type="submit">Attach</button><button class="btn" type="button" data-act="discard-file" data-v="${i}">Discard</button></span><span class="err" role="alert"></span></form>`).join('')}
+      </div></section>` : ''}
+    ${pv ? `<section class="card" data-key="preview" id="copy-preview">
+      <div class="card-head"><h2>Signed Copy of ${esc(pv.challan)}</h2><button class="link" type="button" data-act="preview" data-v="${esc(pv.challan)}">Close</button></div>
+      <div class="card-body preview">${copySrc(pv) ? `<img data-copy="${esc(pv.challan)}" alt="Signed copy of ${esc(pv.challan)}">` : `<p class="muted">${esc(pv.copy.name)} is a PDF. In the full product it opens here.</p>`}
+        <span class="copy-cell">${copyActions(pv)}</span></div></section>` : ''}
+    <section class="sec"><h2>All Challans</h2>
+      <div class="table-wrap"><table class="rtable"><thead><tr><th class="l">Challan#</th><th class="l">Customer and PO</th><th>Unbilled value</th><th>Signed copy</th></tr></thead><tbody>
+      ${rows.map(({ d, p, open: v }) => `<tr id="sc-${esc(d.challan)}"><td class="lead l" data-label="Challan"><b>${esc(d.challan)}</b><small>${dstr(d.date)}</small></td><td class="l" data-label="Customer and PO"><span>${esc(p.customer)}<small><a class="plain" href="${poHref(p.id)}">${esc(p.id)}</a></small></span></td><td data-label="Unbilled value">${rs(v)}</td><td data-label="Signed copy"><span class="copy-cell">${thumb(d)}${copyActions(d)}</span></td></tr>`).join('')}
+      </tbody></table></div></section>
+  </div>`;
+}
+function viewSchedule() {
+  const open = allFigs().filter(x => x.f.notBilled > 0).sort((a, b) => b.f.age - a.f.age);
+  const sum = k => open.reduce((s, x) => s + x.f[k], 0);
+  const pending = sum('notBilled') - sum('counts');
+  const opens = openByDC(), chase = state.deliveries.filter(d => !d.signed && opens[d.challan] > 0);
+  return `
+  <header class="head"><div><h1>Unbilled Schedule</h1><p class="muted">For your CA and bank. Built from your POs, challans and Tally invoices.</p></div></header>
+  <div class="pad stack">
+    ${reviewBanner()}
+    ${chase.length ? `<p class="banner" id="sch-chase">${icon('alert')}<span>${rs(pending)} does not count yet: ${chase.map(d => esc(d.challan)).join(', ')} ${chase.length === 1 ? 'has' : 'have'} no approved signed copy. <a href="#challans">Open Signed Challans</a></span></p>` : ''}
+    <article class="paper report" id="schedule-doc" data-key="schedule">
+      <div class="rep-head">
+        <p class="muted">${esc(CONSIGNOR.name)}</p>
+        <h2>Unbilled Deliveries</h2>
+        <p class="muted">As on ${dstr(TODAY)}</p>
+        <p class="muted">Unbilled at sale value (PO price), before GST</p>
+        <span class="stamp">Draft for CA review</span>
+      </div>
+      <div class="table-wrap"><table class="rtable">
+        <thead><tr><th class="l">Customer and PO</th><th>PO value</th><th>Delivered</th><th>Billed</th><th>Not billed</th><th>Age</th><th class="l">Reason</th><th>With signed challan</th></tr></thead>
+        <tbody>${open.map(({ p, f }) => `<tr><td class="lead l" data-label="Customer"><b>${esc(p.customer)}</b><small>${esc(p.id)}</small></td><td data-label="PO value">${rs(f.value)}</td><td data-label="Delivered">${rs(f.delivered)}</td><td data-label="Billed">${rs(f.billed)}</td><td data-label="Not billed"><b>${rs(f.notBilled)}</b></td><td class="nowrap" data-label="Age">${f.age} days</td><td class="l" data-label="Reason">${STATUS[f.status][0]}</td><td data-label="With signed challan"><span><b>${rs(f.counts)}</b><small>${f.signed} of ${f.ds.length} signed</small></span></td></tr>`).join('')}
+        <tr class="tot"><td class="l lead" data-label="Total">Total, ${plural(open.length, 'PO')}</td><td data-label="PO value">${rs(sum('value'))}</td><td data-label="Delivered">${rs(sum('delivered'))}</td><td data-label="Billed">${rs(sum('billed'))}</td><td data-label="Not billed" id="schedule-total">${rs(sum('notBilled'))}</td><td class="blank"></td><td class="blank"></td><td data-label="With signed challan" id="schedule-counts">${rs(sum('counts'))}</td></tr></tbody></table></div>
+      <div class="rep-lines">
+        <p><span>Closing stock, from Tally, at cost</span><b id="sch-stock">${rs(state.stock)}</b></p>
+        <p><span>Sundry debtors, from Tally, with GST</span><b id="sch-debtors">${rs(state.debtors)}</b></p>
+        <p class="strong"><span>Unbilled with signed challans, at sale value</span><b id="sch-counts">${rs(sum('counts'))}</b></p>
+        <p><span>Unbilled, signed challan pending, does not count yet</span><b id="sch-pending">${rs(pending)}</b></p>
+      </div>
+      <p class="doc-note">The stock statement has no line for unbilled deliveries, so this sheet goes with it. A delivery counts only if your sanction letter allows it, and a signed challan is the only proof. These figures are at different values, so they are not added together. Your CA confirms these goods are not also in closing stock, so nothing is counted twice.</p>
+    </article>
+    <p class="muted report" style="width:100%">In the full product this downloads as PDF or Excel, with the signed challans attached. This demo assumes your sanction letter allows unbilled deliveries.</p>
+  </div>`;
+}
+
+/* ---------- render and routing ---------- */
+const SCREENS = {
+  overview: { label: 'Home', short: 'Home', ic: 'overview', view: viewOverview },
+  'purchase-orders': { label: 'Purchase Orders', short: 'POs', ic: 'pos', view: viewPOs },
+  challans: { label: 'Signed Challans', short: 'DCs', ic: 'signed', view: viewChallans },
+  tally: { label: 'Tally Invoices', short: 'Tally', ic: 'tally', view: viewTally },
+  schedule: { label: 'Unbilled Schedule', short: 'Schedule', ic: 'schedule', view: viewSchedule },
+};
+const $ = id => document.getElementById(id);
+function render() {
+  const h = ui.route, isNew = h === 'new-po';
+  const po = SCREENS[h] || isNew ? null : state.pos.find(p => slug(p.id) === h);
+  const key = SCREENS[h] ? h : po || isNew ? 'purchase-orders' : 'overview';
+  $('main').innerHTML = `<div class="wrap">${isNew ? formAddPO() : SCREENS[h] ? SCREENS[h].view() : po ? viewPO(po) : viewOverview()}</div>`;
+  document.querySelectorAll('img[data-copy]').forEach(i => { i.src = copySrc(byDC(i.dataset.copy)); });
+  const badge = { tally: unmatched().length, challans: state.deliveries.filter(d => copyState(d) === 'waiting').length };
+  $('nav').innerHTML = Object.entries(SCREENS).map(([k, s]) => `<a href="#${k}" ${k === key ? 'aria-current="page"' : ''}>${icon(s.ic)}<span class="nl">${s.label}</span><span class="ns">${s.short}</span>${badge[k] ? `<span class="count">${badge[k]}</span>` : ''}</a>`).join('');
+  $('live-total').textContent = rs(totals().notBilled);
+  if (ui.flash) {
+    const el = document.querySelector(`[data-key="${ui.flash}"]`);
+    ui.flash = null;
+    if (el) {
+      el.classList.add('flash');
+      el.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+  }
+}
+function onRoute() {
+  const next = location.hash.slice(1) || 'overview';
+  const changed = next !== ui.route;
+  ui.route = next;
+  if (changed) { ui.logging = null; window.scrollTo(0, 0); }
+  render();
+  if (changed && !$('guide').contains(document.activeElement) && document.activeElement !== $('top-q')) $('main').focus({ preventScroll: true });
+}
+function go(name) {
+  if ((location.hash.slice(1) || 'overview') === name) onRoute(); else location.hash = name;
+}
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.innerHTML = `${icon('check')}<span>${esc(msg)}</span>`; t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 4200);
+}
+
+/* ---------- guide: press the blue button, say one line, repeat ---------- */
+const DEMO_PO = 'PO-2026-0512';
+function billDemo(share) {
+  const po = poById(DEMO_PO), f = fig(po);
+  const amount = Math.max(0, share * f.delivered - f.billed);
+  if (amount > 0) { createInvoice(po.customer, po.id, amount); }
+  sync();
+}
+// Each press does one thing and stays on the screen that shows the result. The bar says what the next press will do.
+const STEPS = [
+  { who: 'Owner', title: 'Start with the money', text: 'This is material that has left your store with no invoice yet, PO by PO, with its age.', btn: 'Next: a new PO', act() { go('purchase-orders'); } },
+  { who: 'Account Manager', title: 'A new PO comes in', text: 'Enter it once. This register replaces the Excel row.', btn: 'Add the PO',
+    act() {
+      addPO({ id: DEMO_PO, customer: 'RST Networks Pvt Ltd', item: 'Optical fibre cable, 24 core', hsn: '8544', unit: 'm', rate: 25, qty: 320000, terms: '75' });
+      ui.flash = 'status'; go(slug(DEMO_PO)); toast(`${DEMO_PO} added for ${rs(fig(poById(DEMO_PO)).value)}.`);
+    } },
+  { who: 'Account Manager', title: 'Material goes out', text: 'Log the delivery and the challan is ready, already linked to the PO.', btn: 'Log delivery',
+    act() {
+      const po = poById(DEMO_PO), left = po.qty - fig(po).qtyDelivered;
+      if (left > 0) logDelivery(po, left, 'MH 04 XX 1234', '1234 5678 9012');
+      ui.flash = 'challan'; go(slug(DEMO_PO)); toast(`Delivered. Not billed yet is now ${rs(totals().notBilled)}.`);
+    } },
+  { who: 'Accounts team', title: 'Invoice in Tally, as usual', text: 'Accounts bills 75% in Tally with the PO number on it. TrackBill picks it up at the next sync.', btn: 'Raise invoice and sync',
+    act() { billDemo(.75); ui.challan = null; ui.flash = 'notbilled'; go(slug(DEMO_PO)); toast(`Invoice matched to ${DEMO_PO}. Not billed yet is now ${rs(totals().notBilled)}.`); } },
+  { who: 'Accounts team', title: 'One invoice has no PO number', text: 'TrackBill does not guess. It holds the invoice until someone checks it.', btn: 'Show that invoice', act() { ui.flash = 'review-card'; go('tally'); } },
+  { who: 'Accounts team', title: 'Match it once', text: 'Pick the right PO and the figures correct themselves.', btn: 'Match the invoice',
+    act() { matchInvoice('INV/26-27/0342', 'PO-2026-0480'); go('tally'); toast(`Matched to PO-2026-0480. Not billed yet is now ${rs(totals().notBilled)}.`); } },
+  { who: 'Account Manager', title: 'The customer accepts', text: 'Record the acceptance and the balance becomes money you can bill now.', btn: 'Record acceptance',
+    act() { const po = poById(DEMO_PO); if (!po.acceptedOn) { po.acceptedOn = TODAY; po.acceptSeq = state.seq++; } ui.flash = 'status'; go(slug(DEMO_PO)); toast(`Ready to bill: ${rs(fig(po).notBilled)}.`); } },
+  { who: 'Accounts team', title: 'Bill the balance', text: 'The last 25% is invoiced in Tally, and the PO closes at 100%.', btn: 'Raise invoice and sync',
+    act() { billDemo(1); ui.flash = 'status'; go(slug(DEMO_PO)); toast(`${DEMO_PO} is fully billed.`); } },
+  { who: 'CA and bank', title: 'A clean schedule at month end', text: 'Every unbilled delivery at sale value, with its age and reason. Only those with an approved signed challan count. Your CA reviews it first.', btn: 'Open the schedule', act() { ui.flash = 'schedule'; go('schedule'); } },
+  { who: 'End of demo', title: 'That is the full cycle', text: 'Click around freely, or run it again from the start.', btn: 'Restart demo', act() { restart(); } },
+];
+function renderGuide() {
+  const s = STEPS[guide.i];
+  $('guide').classList.toggle('min', guide.hidden);
+  $('g-card').hidden = guide.hidden;
+  $('g-show').hidden = !guide.hidden;
+  $('g-step').textContent = `Step ${guide.i + 1} of ${STEPS.length}`;
+  $('g-who').textContent = s.who;
+  $('g-bar').style.width = (guide.i + 1) / STEPS.length * 100 + '%';
+  $('g-title').textContent = s.title;
+  $('g-text').textContent = s.text;
+  $('g-go').textContent = s.btn;
+  $('g-restart').hidden = !guide.i || guide.i === STEPS.length - 1;
+}
+function restart() {
+  state = seed();
+  Object.assign(ui, { minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [] });
+  $('top-q').value = '';
+  guide.i = 0;
+  renderGuide();
+  go('overview');
+  toast('Demo restarted with the sample data.');
+}
+
+/* ---------- events ---------- */
+const routePO = () => state.pos.find(p => slug(p.id) === ui.route);
+const ACTIONS = {
+  'toggle-add': () => go(ui.route === 'new-po' ? 'purchase-orders' : 'new-po'),
+  'toggle-log': () => { ui.logging = ui.logging ? null : routePO().id; render(); if ($('d-qty')) $('d-qty').focus(); },
+  accept: () => { const po = routePO(); po.acceptedOn = TODAY; po.acceptSeq = state.seq++; render(); toast('Customer acceptance recorded.'); },
+  'show-challan': a => { ui.challan = ui.challan === a.dataset.v ? null : a.dataset.v; ui.flash = ui.challan ? 'challan' : null; render(); },
+  approve: a => { const d = byDC(a.dataset.v), before = countsTotal(); d.signed = true; d.signedOn = TODAY; d.signSeq = state.seq++; render(); const gain = countsTotal() - before; toast(gain ? `${d.challan} approved. ${rs(gain)} more now counts for the bank.` : `${d.challan} approved.`); },
+  'reject-copy': a => { const d = byDC(a.dataset.v); d.copy = null; if (ui.preview === d.challan) ui.preview = null; render(); toast(`Copy of ${d.challan} rejected. Ask the site for a clearer one.`); },
+  preview: a => { const v = a.dataset.v; ui.preview = ui.route === 'challans' && ui.preview === v ? null : v; ui.flash = ui.preview ? 'preview' : null; go('challans'); },
+  'sample-copies': () => { const miss = state.deliveries.filter(d => copyState(d) === 'missing'); miss.forEach(d => { d.copy = { name: 'Sample copy', src: sampleSrc(d), on: TODAY, seq: state.seq++ }; }); render(); toast(`Sample copy added to ${plural(miss.length, 'challan')}, waiting for approval.`); },
+  'discard-file': a => { ui.loose.splice(+a.dataset.v, 1); render(); },
+  sync: () => { const r = sync(); render(); toast(r.n ? `Synced ${plural(r.n, 'invoice')}: ${r.auto} matched, ${r.review} to review.` : 'Nothing new in Tally.'); },
+  'guide-next': () => { $('toast').hidden = true; const last = guide.i === STEPS.length - 1; STEPS[guide.i].act(); if (last) return; guide.i++; renderGuide(); },
+  'guide-restart': () => restart(),
+  'guide-hide': () => { guide.hidden = true; renderGuide(); $('g-show').focus(); },
+  'guide-show': () => { guide.hidden = false; renderGuide(); $('g-go').focus(); },
+};
+const fail = (form, msg) => { form.querySelector('.err').textContent = msg; };
+const FORMS = {
+  'add-po': form => {
+    const d = Object.fromEntries(new FormData(form));
+    const err = addPO({ ...d, qty: +d.qty, rate: +d.rate });
+    if (err) return fail(form, err);
+    const id = d.id.trim(); go(slug(id)); toast(`${id} added.`);
+  },
+  'log-delivery': form => {
+    const po = routePO(), d = Object.fromEntries(new FormData(form));
+    const err = logDelivery(po, +d.qty, d.vehicle, d.ewb);
+    if (err) return fail(form, err);
+    ui.logging = null; ui.flash = 'challan'; render(); toast(`Challan ${ui.challan} created.`);
+  },
+  'tally-invoice': form => {
+    const d = Object.fromEntries(new FormData(form));
+    const err = createInvoice(d.customer, d.poRef, +d.amount);
+    if (err) return fail(form, err);
+    render(); toast('Invoice raised in Tally. Press Sync Now to bring it in.');
+  },
+  'assign-copy': form => {
+    const i = +form.dataset.i, f = ui.loose[i], id = new FormData(form).get('dc');
+    if (!id) return fail(form, 'Choose the challan this copy belongs to.');
+    byDC(id).copy = { name: f.name, src: f.src, on: TODAY, seq: state.seq++ };
+    ui.loose.splice(i, 1); render(); toast(`Attached to ${id}, waiting for approval.`);
+  },
+  match: form => {
+    const po = new FormData(form).get('po');
+    if (!po) return fail(form, 'Choose the PO this invoice belongs to.');
+    matchInvoice(form.dataset.inv, po); render(); toast(`Matched to ${po}. Not billed yet is now ${rs(totals().notBilled)}.`);
+  },
+};
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-act]');
+  if (a) { if (!a.disabled && ACTIONS[a.dataset.act]) ACTIONS[a.dataset.act](a); return; }
+  const tr = e.target.closest('tr[data-go]');
+  if (tr && !e.target.closest('a,button')) go(tr.dataset.go);
+});
+document.addEventListener('submit', e => { e.preventDefault(); const f = FORMS[e.target.dataset.form]; if (f) f(e.target); });
+document.addEventListener('input', e => {
+  const t = e.target;
+  // ponytail: the search lives in the top bar and is hidden on a phone, where the status filter covers six POs.
+  if (t.id === 'top-q') { ui.q = t.value; if (ui.route === 'purchase-orders') $('po-rows').innerHTML = poRows(); else if (ui.q) go('purchase-orders'); }
+  if (t.form && t.form.dataset.form === 'add-po') { const a = rs(Math.max(0, $('f-qty').value * $('f-rate').value)); $('f-amt').textContent = a; $('f-total').textContent = a; }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'po-status') { ui.st = e.target.value; $('po-rows').innerHTML = poRows(); }
+  if (e.target.id === 'age-filter') { ui.minAge = +e.target.value; render(); $('age-filter').focus(); }
+  if (e.target.type === 'file' && e.target.files.length) attachFiles([...e.target.files], e.target.dataset.dc || null);
+});
+// Files dropped on the upload box are attached. Anywhere else the browser would open them, so that is stopped.
+const dropZone = e => e.target.closest ? e.target.closest('.drop') : null;
+document.addEventListener('dragover', e => { e.preventDefault(); const z = dropZone(e); document.querySelectorAll('.drop').forEach(x => x.classList.toggle('over', x === z)); });
+document.addEventListener('dragleave', e => { if (!e.relatedTarget) document.querySelectorAll('.drop.over').forEach(x => x.classList.remove('over')); });
+document.addEventListener('drop', e => { e.preventDefault(); if (dropZone(e) && e.dataTransfer.files.length) attachFiles([...e.dataTransfer.files]); });
+document.addEventListener('keydown', e => { if (e.key === '/' && !e.target.closest('input,select,textarea')) { e.preventDefault(); $('top-q').focus(); } });
+window.addEventListener('hashchange', onRoute);
+
+/* ---------- start ---------- */
+$('logo').innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1f6fe5" d="M4 2.5h16v19l-2.67-1.6-2.66 1.6L12 19.9l-2.67 1.6-2.66-1.6L4 21.5z"/><path d="M8 8h8M8 12.5h8" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>';
+$('search-ic').innerHTML = icon('search', 15);
+$('top-plus').innerHTML = icon('plus', 16);
+if ('ResizeObserver' in window) new ResizeObserver(() => document.documentElement.style.setProperty('--guide-h', $('guide').offsetHeight + 'px')).observe($('guide'));
+ui.route = location.hash.slice(1) || 'overview';
+renderGuide();
+render();
+</script>
+</body></html>
