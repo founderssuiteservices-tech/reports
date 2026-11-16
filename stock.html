@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 <style>
 /* One light theme on purpose: white pages, thin lines, one blue, 13 px Inter, no card shadows.
-   The top bar and left menu hold the four places people work. The demo guide is a slim bar docked at the bottom, so it never covers the work. */
+   The top bar and left menu hold the four places people work. The demo guide rings one part of the screen, dims the rest and explains the part in a card beside it. */
 :root{
   color-scheme:light;
   --top-h:48px;--side-w:224px;--guide-h:72px;--tabs-h:0px;
@@ -123,6 +123,7 @@ main{min-width:0;padding-bottom:calc(var(--guide-h) + 32px)}
 .cap{font-size:14px;color:var(--label)}
 .seg{display:flex;gap:2px;height:14px}
 .seg:empty{background:var(--line);border-radius:3px}
+#home-age{display:grid;gap:14px}
 .seg i{display:block;min-width:3px;border-radius:3px}
 .a0{background:var(--a0)}.a1{background:var(--a1)}.a2{background:var(--a2)}.a3{background:var(--a3)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 24px;list-style:none}
@@ -273,21 +274,35 @@ label.btn:focus-within,.drop:focus-within{outline:2px solid var(--blue);outline-
 .preview img{display:block;max-width:min(100%,640px);height:auto;border:1px solid var(--line);border-radius:6px}
 .fld{display:grid;gap:4px;min-width:0}
 
-/* Guide */
+/* Guide: a ring around one part of the screen, the rest dimmed, and a card beside it that explains the part in plain words.
+   On a phone the card docks at the bottom. The dim lets clicks through, so the page works as usual. */
+#spot{position:fixed;z-index:24;pointer-events:none;border-radius:8px;box-shadow:0 0 0 2px var(--blue),0 0 0 100vmax rgba(24,28,45,.32)}
 #guide{position:fixed;z-index:25;left:var(--side-w);right:0;bottom:0}
-#g-card{background:#fff;border-top:1px solid var(--line-2);box-shadow:0 -2px 10px rgba(33,38,60,.06)}
+#g-card{position:relative;background:#fff;border-top:1px solid var(--line-2);box-shadow:0 -2px 10px rgba(33,38,60,.06)}
+#guide.float{right:auto;bottom:auto;width:min(380px,calc(100vw - 32px))}
+#guide.float #g-card{overflow:hidden;border:1px solid var(--line-2);border-radius:8px;box-shadow:0 12px 32px rgba(24,28,45,.24)}
 .g-bar{height:2px;margin-top:-1px;background:var(--line)}
+#guide.float .g-bar{margin-top:0}
 .g-bar i{display:block;height:100%;background:var(--blue)}
-.g-in{display:flex;align-items:center;justify-content:space-between;gap:8px 24px;padding:9px var(--gr) calc(9px + env(safe-area-inset-bottom,0px)) var(--gl)}
-.g-copy{flex:1 1 auto;min-width:0}
-.g-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 10px}
-#g-title{font-size:13px}
-.g-meta{font-size:12px;color:var(--muted)}
-#g-text{color:var(--label)}
-.g-actions{flex:none;display:flex;align-items:center;gap:4px}
+.g-in{display:flex;align-items:flex-end;justify-content:space-between;gap:10px 24px;padding:10px var(--gr) calc(10px + env(safe-area-inset-bottom,0px)) var(--gl)}
+#guide.float .g-in{display:grid;padding:12px 16px 14px}
+.g-copy{flex:1 1 auto;display:grid;gap:4px;min-width:0;max-width:760px}
+.g-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding-right:34px;font-size:11px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--th)}
+.g-dots{display:inline-flex;gap:4px}
+.g-dots i{width:6px;height:6px;border-radius:50%;background:var(--line-2)}
+.g-dots i.on{background:var(--blue)}
+#g-title{font-size:15px}
+#g-text{color:var(--label);text-wrap:pretty}
+.g-term{margin-top:4px;padding:6px 10px;border-left:2px solid var(--blue);border-radius:0 4px 4px 0;background:var(--current);font-size:12.5px;color:var(--fg);text-wrap:pretty}
+.g-term b{color:var(--head)}
+.g-k{margin-right:4px;font-size:10.5px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--link)}
+.g-actions{flex:none;display:flex;align-items:center;gap:6px}
+.g-push{flex:1}
 .g-link{height:33px;padding:0 8px;border:0;background:none;color:var(--link);cursor:pointer}
 .g-link:hover{text-decoration:underline}
-#g-go{min-width:172px;margin-left:6px}
+#g-go{min-width:120px}
+.g-x{position:absolute;top:6px;right:6px;display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);cursor:pointer}
+.g-x:hover{background:var(--hover);color:var(--fg)}
 #guide.min{left:auto;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 .g-show{height:33px;padding:0 12px;border:1px solid var(--line-2);border-radius:5px;background:#fff;color:var(--fg);font-weight:500;box-shadow:0 2px 10px rgba(33,38,60,.12);cursor:pointer}
 #toast{position:fixed;z-index:30;bottom:calc(var(--guide-h) + 12px);left:calc(50% + var(--side-w)/2);transform:translateX(-50%);width:max-content;max-width:min(560px,calc(100vw - var(--side-w) - 32px));display:flex;align-items:flex-start;gap:8px;padding:9px 14px;background:#fff;border:1px solid var(--line-2);border-radius:6px;box-shadow:0 4px 16px rgba(33,38,60,.12);color:var(--fg)}
@@ -388,9 +403,12 @@ a.bar-btn{text-decoration:none}
   .rep-head h2{font-size:16px}
   #guide{left:0}
   #toast{left:50%;max-width:calc(100vw - 32px)}
-  .g-in{display:grid;gap:6px;padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
-  .g-actions{gap:2px}
-  #g-go{flex:1;min-width:0;margin-left:4px}
+  .g-in{display:grid;gap:8px;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .g-meta{padding-right:44px}
+  .g-push{display:none}
+  .g-actions{gap:4px}
+  #g-go{flex:1;min-width:0}
+  .g-x{top:0;right:max(0px,env(safe-area-inset-right,0px));width:44px;height:44px}
   .g-show{min-height:44px}
 }
 </style>
@@ -412,20 +430,25 @@ a.bar-btn{text-decoration:none}
   </aside>
   <main id="main" tabindex="-1"></main>
 </div>
+<div id="spot" hidden></div>
 <section id="guide" aria-label="Demo guide">
   <div id="g-card">
     <div class="g-bar"><i id="g-bar"></i></div>
     <div class="g-in">
-      <div class="g-copy">
-        <div class="g-top"><h2 id="g-title"></h2><span class="g-meta"><span id="g-step"></span> · <span id="g-who"></span></span></div>
+      <div class="g-copy" aria-live="polite">
+        <p class="g-meta"><span><span id="g-step"></span> · <span id="g-who"></span></span><span class="g-dots" id="g-dots" aria-hidden="true"></span></p>
+        <h2 id="g-title"></h2>
         <p id="g-text"></p>
+        <p class="g-term" id="g-term" hidden></p>
       </div>
       <div class="g-actions">
         <button class="g-link" id="g-restart" type="button" data-act="guide-restart">Restart</button>
-        <button class="g-link" type="button" data-act="guide-hide">Hide</button>
+        <span class="g-push"></span>
+        <button class="btn" id="g-back" type="button" data-act="guide-back">Back</button>
         <button class="btn primary" id="g-go" type="button" data-act="guide-next"></button>
       </div>
     </div>
+    <button class="g-x" type="button" data-act="guide-hide" aria-label="Hide the demo guide"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <button class="g-show" id="g-show" type="button" data-act="guide-show" hidden>Show demo guide</button>
 </section>
@@ -687,14 +710,16 @@ function viewOverview() {
     <section class="card">
       <div class="card-head"><h2>Delivered, Not Billed</h2><a class="plain" href="#new-po">+ New PO</a></div>
       <div class="card-body">
-        <div>
+        <div id="home-total">
           <p class="cap">Total not billed, across ${plural(t.open, 'PO')}</p>
           <p class="big" id="total-notbilled">${rs(t.notBilled)}</p>
           <p class="muted">Material that has left your store with no invoice yet. All amounts before GST.</p>
         </div>
+        <div id="home-age">
         <div class="seg" role="img" aria-label="Not billed by age: ${buckets.map(b => `${b.label} ${rs(b.sum)}`).join(', ')}">${buckets.filter(b => b.sum > 0).map(b => `<i class="a${b.i}" style="flex:${b.sum} 1 0" title="${b.label}: ${rs(b.sum)}, ${share(b)}%"></i>`).join('')}</div>
         <ul class="legend">${buckets.map(b => `<li><i class="a${b.i}"></i>${b.label} : <b>${rs(b.sum)}</b></li>`).join('')}</ul>
         <p class="muted">${over15.length ? `${plural(over15.length, 'PO')}, ${rs(over15.reduce((s, x) => s + x.f.notBilled, 0))}, ${over15.length === 1 ? 'has' : 'have'} been unbilled for over 15 days.` : 'Nothing has been unbilled for over 15 days.'}</p>
+        </div>
       </div>
       <div class="figs card-foot">
         <div class="fig"><span>Delivered</span><b>${rs(t.delivered)}</b></div>
@@ -703,7 +728,7 @@ function viewOverview() {
       </div>
     </section>
     <div class="home-grid">
-      <section class="card">
+      <section class="card" id="home-action">
         <div class="card-head"><h2>Needs Action, Oldest First</h2><span><label class="sr" for="age-filter">Filter by age</label><select class="mini-select" id="age-filter">${ageOpts}</select></span></div>
         ${list.length ? `<div class="table-wrap"><table class="rtable"><thead><tr><th class="l">PO</th><th class="l">Status</th><th>Age</th><th>Not billed</th></tr></thead><tbody>
         ${list.map(({ p, f }) => `<tr data-go="${slug(p.id)}"><td class="lead l" data-label="PO"><a class="plain" href="${poHref(p.id)}">${esc(p.id)}</a><small>${esc(p.customer)}</small></td><td class="l" data-label="Status">${statusTag(f.status)}</td><td class="nowrap" data-label="Age"><span class="${ageClass(f.age)}">${f.age} days</span></td><td data-label="Not billed"><b>${rs(f.notBilled)}</b></td></tr>`).join('')}
@@ -1122,6 +1147,7 @@ function render() {
       el.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   }
+  place();
 }
 function onRoute() {
   const next = location.hash.slice(1) || 'overview';
@@ -1129,10 +1155,13 @@ function onRoute() {
   ui.route = next;
   if (changed) { ui.logging = null; window.scrollTo(0, 0); }
   render();
+  if (changed) place(true);
   if (changed && !$('guide').contains(document.activeElement) && document.activeElement !== $('top-q')) $('main').focus({ preventScroll: true });
 }
+// The new screen is drawn before go returns, so the guide can point at it at once. The hashchange that follows finds nothing new.
 function go(name) {
-  if ((location.hash.slice(1) || 'overview') === name) onRoute(); else location.hash = name;
+  if ((location.hash.slice(1) || 'overview') !== name) location.hash = name;
+  onRoute();
 }
 let toastTimer;
 function toast(msg) {
@@ -1142,7 +1171,9 @@ function toast(msg) {
   toastTimer = setTimeout(() => { t.hidden = true; }, 4200);
 }
 
-/* ---------- guide: press the blue button, say one line, repeat ---------- */
+/* ---------- guide: a ring around one part of the screen, explained in plain words ---------- */
+// Eleven steps of one order's story, each told from one person's seat. Each spot rings one part of the screen.
+// Next on a spot with an act does it (adds the PO, logs a delivery, opens the next screen), then moves on.
 const DEMO_PO = 'PO-2026-0512';
 function billDemo(share) {
   const po = poById(DEMO_PO), f = fig(po);
@@ -1150,54 +1181,133 @@ function billDemo(share) {
   if (amount > 0) { createInvoice(po.customer, po.id, amount); }
   sync();
 }
-// Each press does one thing and stays on the screen that shows the result. The bar says what the next press will do.
-const STEPS = [
-  { who: 'Owner', title: 'Start with the money', text: 'This is material that has left your store with no invoice yet, PO by PO, with its age.', btn: 'Next: a new PO', act() { go('purchase-orders'); } },
-  { who: 'Account Manager', title: 'A new PO comes in', text: 'Enter it once. This register replaces the Excel row.', btn: 'Add the PO',
-    act() {
-      addPO({ id: DEMO_PO, customer: 'RST Systems Pvt Ltd', item: 'CAT6 cable', hsn: '8544', unit: 'm', rate: 25, qty: 320000, terms: '75' });
-      ui.flash = 'status'; go(slug(DEMO_PO)); toast(`${DEMO_PO} added for ${rs(fig(poById(DEMO_PO)).value)}.`);
-    } },
-  { who: 'Account Manager', title: 'Material goes out', text: 'Log the delivery and the challan is ready, already linked to the PO.', btn: 'Log delivery',
-    act() {
-      const po = poById(DEMO_PO), left = po.qty - fig(po).qtyDelivered;
-      if (left > 0) logDelivery(po, left, 'MH 04 XX 1234', '1234 5678 9012');
-      ui.flash = 'challan'; go(slug(DEMO_PO)); toast(`Delivered. Not billed yet is now ${rs(totals().notBilled)}.`);
-    } },
-  { who: 'Accounts team', title: 'Invoice in Tally, as usual', text: 'Accounts bills 75% in Tally with the PO number on it. TrackBill picks it up at the next sync.', btn: 'Raise invoice and sync',
-    act() { billDemo(.75); ui.challan = null; ui.flash = 'notbilled'; go(slug(DEMO_PO)); toast(`Invoice matched to ${DEMO_PO}. Not billed yet is now ${rs(totals().notBilled)}.`); } },
-  { who: 'Accounts team', title: 'One invoice has no PO number', text: 'TrackBill does not guess. It holds the invoice until someone checks it.', btn: 'Show that invoice', act() { ui.flash = 'review-card'; go('tally'); } },
-  { who: 'Accounts team', title: 'Match it once', text: 'Pick the right PO and the figures correct themselves.', btn: 'Match the invoice',
-    act() { matchInvoice('INV/26-27/0342', 'PO-2026-0480'); go('tally'); toast(`Matched to PO-2026-0480. Not billed yet is now ${rs(totals().notBilled)}.`); } },
-  { who: 'Account Manager', title: 'The customer accepts', text: 'Record the acceptance and the balance becomes money you can bill now.', btn: 'Record acceptance',
-    act() { const po = poById(DEMO_PO); if (!po.acceptedOn) { po.acceptedOn = TODAY; po.acceptSeq = state.seq++; } ui.flash = 'status'; go(slug(DEMO_PO)); toast(`Ready to bill: ${rs(fig(po).notBilled)}.`); } },
-  { who: 'Accounts team', title: 'Bill the balance', text: 'The last 25% is invoiced in Tally, and the PO closes at 100%.', btn: 'Raise invoice and sync',
-    act() { billDemo(1); ui.flash = 'status'; go(slug(DEMO_PO)); toast(`${DEMO_PO} is fully billed.`); } },
-  { who: 'Owner', title: 'Every project on one page', text: 'Each project from PO to final bill, with what is billed, what is waiting and who acts next. Open one for its own report.', btn: 'Open the project report',
-    act() { ui.cust = ''; ui.flash = 'orderbook'; go('reports'); } },
-  { who: 'CA and bank', title: 'A clean schedule at month end', text: 'Every unbilled delivery at sale value, with its age and reason. Only those with an approved signed challan count. Your CA reviews it first.', btn: 'Open the schedule', act() { ui.flash = 'schedule'; go('schedule'); } },
-  { who: 'End of demo', title: 'That is the full cycle', text: 'Click around freely, or run it again from the start.', btn: 'Restart demo', act() { restart(); } },
+const CHAPTERS = [
+  ['Owner', [
+    { at: '#home-total', head: 'Start with the money', text: 'This is material that has left your store with no invoice yet. Until it is billed, nobody pays you for it.', term: ['Not billed', 'delivered to the customer, but not invoiced yet.'] },
+    { at: '.money', head: 'Always in view', text: 'The same total sits at the top of every screen. Watch it move as one order goes through.' },
+    { at: '#home-age', head: 'How long it has waited', text: 'The bar splits that money by age. Darker blue has waited longer, and the longer it waits, the longer you wait to be paid.', term: ['Age', 'days since the oldest unbilled delivery on that PO.'] },
+    { at: '#home-action', head: 'What to chase first', text: 'Every PO with money waiting, oldest first, with what it is waiting for. A click opens that PO.', term: ['PO', "purchase order: the customer's written order, with the item, quantity and price."],
+      btn: 'Next: a new PO', act() { go('purchase-orders'); } },
+  ]],
+  ['Account Manager', [
+    { at: '#po-rows tr:first-child', head: 'The PO register', text: 'One row per order, newest first. Read across: what it is worth, what has gone out, what is billed and what is still waiting.', term: ['PO value', 'quantity × price on the order, before GST.'] },
+    { at: '.head [data-act="toggle-add"]', head: 'A new PO comes in', text: 'The Account Manager enters it once: customer, item, quantity, price and billing terms. Every challan and invoice after this links back to it.', term: ['Billing terms', 'when you may bill the customer. Here, 75% on delivery and the last 25% once they accept the material.'],
+      btn: 'Add the PO', act() { addPO({ id: DEMO_PO, customer: 'RST Systems Pvt Ltd', item: 'CAT6 cable', hsn: '8544', unit: 'm', rate: 25, qty: 320000, terms: '75' }); go(slug(DEMO_PO)); } },
+    { at: '[aria-label="PO figures"]', head: 'One order, four numbers', text: 'What it is worth, what has gone out, what is billed and what is waiting. Nothing has gone out yet, so nothing is waiting.' },
+  ]],
+  ['Account Manager', [
+    { at: '.actionbar [data-act="toggle-log"]', head: 'Material goes out', text: 'The Account Manager logs the delivery: quantity, vehicle and e-way bill. TrackBill makes the delivery challan, already linked to this PO.', term: ['Delivery challan', 'the slip that travels with the goods. The customer signs it when they arrive.'],
+      btn: 'Log delivery', act() { const po = poById(DEMO_PO), left = po.qty - fig(po).qtyDelivered; if (left > 0) logDelivery(po, left, 'MH 04 XX 1234', '1234 5678 9012'); go(slug(DEMO_PO)); } },
+    { at: '#challan-doc .doc-mid', head: 'The challan is ready', text: 'Customer and PO number come from the PO, vehicle and e-way bill from the delivery. Nobody types them twice.', term: ['E-way bill', 'the GST document made online before goods are moved.'] },
+    { at: '[data-key="notbilled"]', head: 'Now money is waiting', text: 'The material is out but not invoiced, so its value moves into Not billed. The total at the top went up by the same amount.' },
+  ]],
+  ['Accounts team', [
+    { at: '#po-next', head: 'Invoice in Tally, as usual', text: "What's next always says who acts now. Accounts bills 75% in Tally and types the PO number on the invoice.", term: ['Tally', 'the accounting software your accounts team already uses to raise invoices.'],
+      btn: 'Raise invoice and sync', act() { billDemo(.75); ui.challan = null; go(slug(DEMO_PO)); } },
+    { at: '[aria-label="PO figures"]', head: 'Matched on its own', text: 'At the sync, TrackBill read the invoice from Tally. It had this PO number on it, so Billed went up and Not billed came down by themselves.', term: ['Sync', 'TrackBill reading new invoices from Tally. In this demo it is simulated.'] },
+    { at: '.tl', head: 'Every step, with who did it', text: 'PO entered, delivery logged, invoice matched. Anyone can see what happened and when, without asking around.' },
+  ]],
+  ['Accounts team', [
+    { at: '#nav a[href="#tally"]', head: 'One invoice has no PO number', text: 'The count beside Tally means an invoice came in that TrackBill could not match to a PO. It does not guess.',
+      btn: 'Show that invoice', act() { go('tally'); } },
+    { at: '[data-key="review-card"]', head: 'Held for a person to check', text: 'TrackBill matches an invoice only when the PO number and the customer agree. This one has no PO number, so it waits here instead of landing on the wrong order.' },
+  ]],
+  ['Accounts team', [
+    { at: 'form[data-form="match"]', head: 'Match it once', text: 'Accounts picks the right PO from the list. Every figure that depends on it corrects itself.',
+      btn: 'Match the invoice', act() { matchInvoice('INV/26-27/0342', 'PO-2026-0480'); go('tally'); } },
+    { at: '#no-review', head: 'Every invoice matched', text: 'Each invoice now belongs to a PO, so the totals add up, and the count beside Tally is gone.',
+      btn: 'Next: acceptance', act() { go(slug(DEMO_PO)); } },
+  ]],
+  ['Account Manager', [
+    { at: '#po-next', head: 'Waiting on the customer', text: "On these terms the last 25% is billed only after the customer accepts the material. What's next shows the money is waiting on them.", term: ['Acceptance', 'the customer confirming the material arrived and is in order.'] },
+    { at: '.actionbar [data-act="accept"]', head: 'The customer accepts', text: 'When the customer confirms, the Account Manager records it here. The last 25% becomes money you can bill now.',
+      btn: 'Record acceptance', act() { const po = poById(DEMO_PO); if (!po.acceptedOn) { po.acceptedOn = TODAY; po.acceptSeq = state.seq++; } go(slug(DEMO_PO)); } },
+  ]],
+  ['Accounts team', [
+    { at: '#po-status-pill', head: 'Ready to bill', text: 'Nothing stands in the way now. Accounts raises the last invoice in Tally, and TrackBill picks it up at the sync.',
+      btn: 'Raise invoice and sync', act() { billDemo(1); go(slug(DEMO_PO)); } },
+    { at: '[aria-label="PO figures"]', head: 'Billed in full', text: 'Delivered and billed now match, so nothing is waiting on this order. It is closed.',
+      btn: 'Next: every project', act() { ui.cust = ''; go('reports'); } },
+  ]],
+  ['Owner', [
+    { at: '[data-key="orderbook"]', head: 'Every project on one page', text: 'All your orders in one bar. Green is billed, grey is still to deliver, and the colours between are delivered but waiting for a bill.', term: ['Orders in hand', 'the total value of all the POs you have received.'] },
+    { at: '#rep-keys', head: 'Five buckets', text: 'Every rupee of every order sits in exactly one of these. The three in the middle are delivered but not billed, split by what each is waiting for.' },
+    { at: `#rep-table tr[data-go="rep-${slug(DEMO_PO)}"]`, head: 'Our order, start to finish', text: 'The order we just ran is on the list, billed in full. Every project opens into its own one-page report.',
+      btn: 'Open its report', act() { go('rep-' + slug(DEMO_PO)); } },
+    { at: '#pr-steps', head: 'Where one project stands', text: 'Each stage from PO to final bill. A tick is done and a blue dot is in progress: here the signed challan is still awaited.', term: ['Signed copy', 'the challan, signed and stamped by the customer when the goods arrive. It is the proof of delivery.'],
+      btn: 'Next: the bank sheet', act() { go('schedule'); } },
+  ]],
+  ['CA and bank', [
+    { at: '#schedule-doc .table-wrap', head: 'A clean schedule at month end', text: 'Every delivery not billed yet, at sale value, with its age and the reason. The stock statement for your bank has no line for these, so this sheet goes with it.', term: ['Stock statement', 'the monthly report to your bank of the stock you hold and the money owed to you.'] },
+    { at: '#schedule-doc .rep-lines', head: 'What counts for the bank', text: 'Only deliveries with an approved signed challan count. The rest sits on its own line until the signed copy comes in. Your CA reviews the sheet first.', term: ['Drawing power', 'how much the bank lets you borrow, worked out from your stock statement.'] },
+    { at: '#sch-chase', head: 'What to chase', text: 'The challans named here have no approved signed copy yet. Get each copy in and approve it, and its money counts.' },
+  ]],
+  ['End of demo', [
+    { head: 'That is the full cycle', text: 'One order went from PO to final bill, and the bank sheet came from the same records. Click around freely, or run it again from the start.',
+      btn: 'Restart demo', act() { restart(); } },
+  ]],
 ];
+const SPOTS = CHAPTERS.flatMap(([who, spots], ci) => spots.map(s => ({ ...s, ci, who })));
+const canBack = () => guide.i > 0 && !SPOTS[guide.i - 1].act;  // stepping back never undoes what a press did
 function renderGuide() {
-  const s = STEPS[guide.i];
+  const s = SPOTS[guide.i], mine = SPOTS.filter(x => x.ci === s.ci);
   $('guide').classList.toggle('min', guide.hidden);
   $('g-card').hidden = guide.hidden;
   $('g-show').hidden = !guide.hidden;
-  $('g-step').textContent = `Step ${guide.i + 1} of ${STEPS.length}`;
+  $('g-step').textContent = `Step ${s.ci + 1} of ${CHAPTERS.length}`;
   $('g-who').textContent = s.who;
-  $('g-bar').style.width = (guide.i + 1) / STEPS.length * 100 + '%';
-  $('g-title').textContent = s.title;
+  $('g-dots').innerHTML = mine.length > 1 ? mine.map(x => `<i${x === s ? ' class="on"' : ''}></i>`).join('') : '';
+  $('g-bar').style.width = (guide.i + 1) / SPOTS.length * 100 + '%';
+  $('g-title').textContent = s.head;
   $('g-text').textContent = s.text;
-  $('g-go').textContent = s.btn;
-  $('g-restart').hidden = !guide.i || guide.i === STEPS.length - 1;
+  $('g-term').hidden = !s.term;
+  $('g-term').innerHTML = s.term ? `<span class="g-k">Word to know</span> <b>${esc(s.term[0])}</b>: ${esc(s.term[1])}` : '';
+  $('g-go').textContent = s.btn || 'Next';
+  $('g-back').hidden = !canBack();
+  $('g-restart').hidden = !guide.i || guide.i === SPOTS.length - 1;
+  place(true);
 }
+// The ring and the dim go over the page. On a laptop the card goes below the part, else above it, else beside it,
+// else it docks at the bottom as on a phone. jump scrolls the part into view; following a scroll never does.
+const isPhone = () => matchMedia('(max-width: 860px)').matches;
+function place(jump) {
+  const g = $('guide'), ring = $('spot'), s = SPOTS[guide.i], phone = isPhone();
+  const el = !guide.hidden && s.at ? document.querySelector(s.at) : null;
+  let r = el && el.getClientRects().length ? el.getBoundingClientRect() : null;
+  ring.hidden = !r;
+  g.classList.toggle('float', !!r && !phone);
+  g.style.left = g.style.top = '';
+  if (r) {
+    const w = g.offsetWidth, h = g.offsetHeight, gap = 18;
+    const top = document.querySelector(phone ? '.side' : '.top').getBoundingClientRect().bottom + 10;
+    const bottom = innerHeight - 12 - (phone ? h : 0);
+    const room = () => [
+      r.bottom + gap + h <= innerHeight - 16 && [r.left, r.bottom + gap],
+      r.top - gap - h >= top && [r.left, r.top - gap - h],
+      r.right + gap + w <= innerWidth - 16 && [r.right + gap, r.top],
+      r.left - gap - w >= 16 && [r.left - gap - w, r.top],
+    ].find(Boolean);
+    // The top bar and the menu never scroll, so only parts of the page are brought into view.
+    if (jump && !el.closest('.top,.side') && !(r.top >= top && r.bottom <= bottom && (phone || room()))) { scrollBy(0, r.top - top); r = el.getBoundingClientRect(); }
+    // The ring sits 6 px outside the part, but never past the screen edge, so all four sides stay visible.
+    const L = Math.max(2, r.left - 6), T = Math.max(2, r.top - 6), R = Math.min(innerWidth - 2, r.right + 6), B = Math.min(innerHeight - 2, r.bottom + 6);
+    Object.assign(ring.style, { left: L + 'px', top: T + 'px', width: R - L + 'px', height: B - T + 'px' });
+    const at = !phone && room();
+    if (at) { g.style.left = Math.max(16, Math.min(at[0], innerWidth - w - 16)) + 'px'; g.style.top = Math.max(top, Math.min(at[1], innerHeight - h - 16)) + 'px'; }
+    else g.classList.remove('float');
+  }
+  // A docked guide takes the bottom of the screen, so the page leaves room for it. A floating card needs none.
+  document.documentElement.style.setProperty('--guide-h', (g.classList.contains('float') ? 0 : g.offsetHeight) + 'px');
+}
+let placing = 0;
+const follow = () => { if (!placing) placing = requestAnimationFrame(() => { placing = 0; place(); }); };
 function restart() {
   state = seed();
   Object.assign(ui, { minAge: 0, q: '', st: '', logging: null, challan: null, flash: null, preview: null, loose: [], cust: '' });
   $('top-q').value = '';
   guide.i = 0;
-  renderGuide();
   go('overview');
+  renderGuide();
   toast('Demo restarted with the sample data.');
 }
 
@@ -1215,7 +1325,8 @@ const ACTIONS = {
   'discard-file': a => { ui.loose.splice(+a.dataset.v, 1); render(); },
   download: () => toast('In the full product this report downloads as PDF or Excel.'),
   sync: () => { const r = sync(); render(); toast(r.n ? `Synced ${plural(r.n, 'invoice')}: ${r.auto} matched, ${r.review} to review.` : 'Nothing new in Tally.'); },
-  'guide-next': () => { $('toast').hidden = true; const last = guide.i === STEPS.length - 1; STEPS[guide.i].act(); if (last) return; guide.i++; renderGuide(); },
+  'guide-next': () => { $('toast').hidden = true; const s = SPOTS[guide.i], last = guide.i === SPOTS.length - 1; if (s.act) s.act(); if (last) return; guide.i++; renderGuide(); },
+  'guide-back': () => { if (canBack()) { guide.i--; renderGuide(); } },
   'guide-restart': () => restart(),
   'guide-hide': () => { guide.hidden = true; renderGuide(); $('g-show').focus(); },
   'guide-show': () => { guide.hidden = false; renderGuide(); $('g-go').focus(); },
@@ -1276,14 +1387,22 @@ const dropZone = e => e.target.closest ? e.target.closest('.drop') : null;
 document.addEventListener('dragover', e => { e.preventDefault(); const z = dropZone(e); document.querySelectorAll('.drop').forEach(x => x.classList.toggle('over', x === z)); });
 document.addEventListener('dragleave', e => { if (!e.relatedTarget) document.querySelectorAll('.drop.over').forEach(x => x.classList.remove('over')); });
 document.addEventListener('drop', e => { e.preventDefault(); if (dropZone(e) && e.dataTransfer.files.length) attachFiles([...e.dataTransfer.files]); });
-document.addEventListener('keydown', e => { if (e.key === '/' && !e.target.closest('input,select,textarea')) { e.preventDefault(); $('top-q').focus(); } });
-window.addEventListener('hashchange', onRoute);
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,select,textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === '/') { e.preventDefault(); $('top-q').focus(); return; }
+  // The arrow keys, and the Page keys a presentation clicker sends, move the guide. Escape hides it.
+  const k = !guide.hidden && { ArrowRight: 'guide-next', PageDown: 'guide-next', ArrowLeft: 'guide-back', PageUp: 'guide-back', Escape: 'guide-hide' }[e.key];
+  if (k && (k !== 'guide-back' || canBack())) { e.preventDefault(); ACTIONS[k](); }
+});
+window.addEventListener('hashchange', () => { if ((location.hash.slice(1) || 'overview') !== ui.route) onRoute(); });
 
 /* ---------- start ---------- */
 $('logo').innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1f6fe5" d="M4 2.5h16v19l-2.67-1.6-2.66 1.6L12 19.9l-2.67 1.6-2.66-1.6L4 21.5z"/><path d="M8 8h8M8 12.5h8" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>';
 $('search-ic').innerHTML = icon('search', 15);
 $('top-plus').innerHTML = icon('plus', 16);
-if ('ResizeObserver' in window) new ResizeObserver(() => document.documentElement.style.setProperty('--guide-h', $('guide').offsetHeight + 'px')).observe($('guide'));
+if ('ResizeObserver' in window) new ResizeObserver(follow).observe($('guide'));
+addEventListener('scroll', follow, { capture: true, passive: true });
+addEventListener('resize', follow);
 ui.route = location.hash.slice(1) || 'overview';
 renderGuide();
 render();
